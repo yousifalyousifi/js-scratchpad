@@ -81,11 +81,11 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<finalName>helloworld</finalName>
+					<finalName>js-scratchpad</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<archive>
 						<manifest>
-							<mainClass>Main</mainClass>
+							<mainClass>ca.coderdojo.toronto.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
