@@ -1,0 +1,6 @@
+{
+  "name": "CoderDojo JS Scratchpad",
+  "description": "A simple Javascript scratchpad with a console view.",
+  "image": "heroku/java",
+  "addons": [ "heroku-postgresql" ]
+}

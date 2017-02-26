@@ -1,0 +1,6 @@
+target
+.env
+.idea/
+*.iml
+src/main/resources/public/bootstrap-3.3.7-dist/*
+src/main/resources/public/mongoose-free-5.4.1.exe
