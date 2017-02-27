@@ -1,5 +1,6 @@
 package ca.coderdojo.toronto;
 import static spark.Spark.get;
+import static spark.Spark.post;
 import static spark.Spark.port;
 import static spark.Spark.stop;
 import static spark.Spark.init;
@@ -68,16 +69,6 @@ public class Main {
 					return new ModelAndView(attributes, "error.ftl");
 				}
 			} , new FreeMarkerEngine());
-
-			get("/nashorn", (req, res) -> {
-				ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-				String input = "var fun1 = function() { return 'hahahahaha NASHORN'; };";
-				engine.eval(input);
-				Invocable invocable = (Invocable) engine;
-
-				Object result = invocable.invokeFunction("fun1");
-				return result.toString();
-			});
 
 		} catch (Throwable e) {
 			e.printStackTrace();
