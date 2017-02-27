@@ -1,1 +1,1 @@
-INSERT INTO snippets VALUES (DEFAULT, ?, now, now, ?, ?);
+INSERT INTO snippets VALUES (DEFAULT, ?, now(), now(), ?, ?);
