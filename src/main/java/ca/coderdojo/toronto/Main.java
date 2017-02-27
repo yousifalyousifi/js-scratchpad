@@ -75,17 +75,30 @@ public class Main {
 			} , new FreeMarkerEngine());
 
 			get("/edit/save", (req, res) -> {
-				System.out.println("kk");
 				try (Connection connection = dataSource.getConnection()) {
 					PreparedStatement stmt;
-					System.out.println("kdd");
 					stmt = connection.prepareStatement(renderSQL("/db/postcode.ftl"));
-					System.out.println("kkwda");
 					stmt.setString(1, "Yousif");
 					stmt.setString(2, "console.log(\"Example 1\");");
 					stmt.setString(3, "Example 1");
-					//stmt.executeUpdate();
-					return "KK";//renderSQL("/db/postcode.ftl") + " " + "Success";
+					stmt.executeUpdate();
+					return "Success " + renderSQL("/db/postcode.ftl");
+				} catch (Exception e) {
+					return e.getMessage();
+				}
+			});
+			
+			get("/edit/load", (req, res) -> {
+				try (Connection connection = dataSource.getConnection()) {
+					Statement stmt = connection.createStatement();
+					ResultSet rs = stmt.executeQuery(renderSQL("/db/getcode.ftl"));
+					
+					ArrayList<String> output = new ArrayList<String>();
+					while (rs.next()) {
+						output.add(rs.getString("snippet"));
+					}
+					
+					return output.get(0);
 				} catch (Exception e) {
 					return e.getMessage();
 				}

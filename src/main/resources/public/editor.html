@@ -184,5 +184,20 @@ g();
             editor.setFontSize(24);
         });
     </script>
+    <script>
+    $(document).ready(function() {
+        $.ajax({
+          method: "GET",
+          url: "/edit/load"
+        })
+          .done(function( msg ) {
+            alert( "Data Saved: " + msg );
+            editor.setValue(msg);
+          })
+          .fail(function( msg ) {
+            alert( "Data Failed: " + msg );
+          });
+    });
+    </script>
 </body>
 </html>
