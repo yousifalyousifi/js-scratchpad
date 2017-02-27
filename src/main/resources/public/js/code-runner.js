@@ -89,6 +89,8 @@ function CodeRunner(outputId) {
 			return handleNumber(value);
 		} else if(typeof value == "boolean") {
 			return handleBoolean(value);
+		} else if(typeof value == "function") {
+			return handleFunction(value);
 		}
 
 		function handleNull() {
@@ -156,6 +158,17 @@ function CodeRunner(outputId) {
 				}
 			}
 			s.append(squareClose());
+			return s;
+		}
+		function handleFunction(value) {
+			var s = $(document.createElement("span"));
+			var prefix = $(document.createElement("span")).addClass("stringOutput");
+			prefix.text("function ");
+			var funcName = $(document.createElement("span")).addClass("typePrefixOutput");
+			funcName.text(value.name);
+			var brackets = $(document.createElement("span")).addClass("greyOutput");
+			brackets.text("()");
+			s.append(prefix).append(funcName).append(brackets);
 			return s;
 		}
 		function squareOpen() {
