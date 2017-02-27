@@ -10,7 +10,7 @@
         overflow: hidden;
     }
     .wideNavBar {
-        width: 90%;
+        width: 96%;
     }
     #editor {
         border-style: none;
@@ -100,13 +100,22 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">CoderDojo Javascript Sandbox</a>
+          <a class="navbar-brand" href="#">CoderDojo Javascript Scratchpad</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li id="runButton"><a href="#">Run</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Options <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Code <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a id="" href="#">Load</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a id="" href="#">Save</a></li>
+                <li><a id="" href="#">Save As</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">View <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li class="dropdown-header">Font Size</li>
                 <li><a id="font14px" href="#">14px</a></li>
@@ -155,7 +164,7 @@ g();
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
-
+    <script src="js/RateLimit.js"></script>
     <script src="js/code-runner.js"></script>
     <script>
         var editor = ace.edit("editor");

@@ -4,6 +4,13 @@ function CodeRunner(outputId) {
 	
 	this.outputId = outputId;
 
+	function appender(line) {
+		$('#' + me.outputId).append(line);
+		scrollToBottom();
+	};
+
+	var rateLimitedAppender = appender;//RateLimit(appender, 50);
+
 	function replaceConsole(outputId) {
 		console.log("Replacing console.");
 		if (typeof console  != "undefined") 
@@ -30,14 +37,14 @@ function CodeRunner(outputId) {
 		var line = $(document.createElement("p"));
 		line.addClass("codeOutput");
 		line.html(getHTMLForOutput(message));
-		$('#' + me.outputId).append(line);
+		rateLimitedAppender(line);
 	};
 
 	function newerror(message) {
 		var line = $(document.createElement("p"));
 		line.addClass("codeOutputError");
 		line.text(" " + message);
-		$('#' + me.outputId).append(line);
+		rateLimitedAppender(line);
 	};
 
 
@@ -49,7 +56,6 @@ function CodeRunner(outputId) {
 			handleException(e);
 		}
 		insertCodeOutputSeparator();
-		scrollToBottom();
 	};
 
 	function insertCodeOutputSeparator() {
@@ -61,7 +67,7 @@ function CodeRunner(outputId) {
 	function scrollToBottom() {
 		// var d = $('#' + me.outputId);
 		// d.scrollTop(d.prop("scrollHeight"));
-		$('#' + me.outputId).animate({ scrollTop: $('#' + me.outputId).prop("scrollHeight")}, 500);
+		$('#' + me.outputId).animate({ scrollTop: $('#' + me.outputId).prop("scrollHeight")}, 10);
 	};
 
 	function getHTMLForOutput(value, withQuotesIfString) {
