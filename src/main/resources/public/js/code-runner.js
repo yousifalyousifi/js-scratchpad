@@ -6,7 +6,6 @@ function CodeRunner(outputId) {
 
 	function appender(line) {
 		$('#' + me.outputId).append(line);
-		scrollToBottom();
 	};
 
 	var rateLimitedAppender = appender;//RateLimit(appender, 50);
@@ -23,8 +22,8 @@ function CodeRunner(outputId) {
 		    }     
 
 		console.log = function(message) {
-		    console.olog(message);
-		    newconsole(message);
+		    console.olog(arguments);
+		    newconsole(arguments);
 		};
 		console.error = function(message) {
 		    console.oerror(message);
@@ -34,20 +33,25 @@ function CodeRunner(outputId) {
 	};
 
 	function newconsole(message) {
-		var line = $(document.createElement("p"));
-		line.addClass("codeOutput");
-		line.html(getHTMLForOutput(message));
-		rateLimitedAppender(line);
+		var args = arguments[0];
+		for(var i = 0; i < args.length; i++) {
+			var line = $(document.createElement("span"));
+			line.addClass("codeOutput");
+			console.olog("inspect  " + args[i]);
+			line.html(getHTMLForOutput(args[i]));
+			line.html(line.html() + " ");
+			appender(line);
+		}
+		appender(document.createElement("br"));
 	};
 
 	function newerror(message) {
-		var line = $(document.createElement("p"));
+		var line = $(document.createElement("span"));
 		line.addClass("codeOutputError");
-		line.text(" " + message);
-		rateLimitedAppender(line);
+		line.text(" " + message + " ");
+		appender(line);
+		appender(document.createElement("br"));
 	};
-
-
 
 	this.runThis = function(code) {
 		try {
@@ -56,6 +60,7 @@ function CodeRunner(outputId) {
 			handleException(e);
 		}
 		insertCodeOutputSeparator();
+		scrollToBottom();
 	};
 
 	function insertCodeOutputSeparator() {
@@ -67,7 +72,7 @@ function CodeRunner(outputId) {
 	function scrollToBottom() {
 		// var d = $('#' + me.outputId);
 		// d.scrollTop(d.prop("scrollHeight"));
-		$('#' + me.outputId).animate({ scrollTop: $('#' + me.outputId).prop("scrollHeight")}, 10);
+		$('#' + me.outputId).animate({ scrollTop: $('#' + me.outputId).prop("scrollHeight")}, 500);
 	};
 
 	function getHTMLForOutput(value, withQuotesIfString) {

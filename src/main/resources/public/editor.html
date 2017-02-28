@@ -61,9 +61,13 @@
     }
     .codeOutputError {
         color: rgb(216, 212, 212);
+        display: inline-block;
+        margin: 2px 0px;
         background-color: rgba(255, 0, 0, 0.43);
     }
     .codeOutput {
+        display: inline-block;
+        margin: 2px 0px;
         color: grey;
     }
     .codeRunSeparator {
@@ -143,12 +147,13 @@ var arr = [];
 var arrr = ["adwd", undefined, 23, 93, "231", null];
 
 console.log(obj);
+console.log(foo);
 console.log(objj);
 console.log(arr);
 console.log(arrr);
 console.error("My error");
 console.log(324);
-console.log("strrrrIng://");
+console.log("strrrrIng://", 123, true, foo);
 console.log(true);
 g();
 </pre>
