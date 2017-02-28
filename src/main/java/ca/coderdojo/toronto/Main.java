@@ -4,15 +4,21 @@ import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.stop;
 
+import java.io.PrintWriter;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.sql.DataSource;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -47,12 +53,25 @@ public class Main {
 				response.redirect("editor.html"); 
 				return null;
 			});
-
-			HikariConfig config = new HikariConfig();
-			config.setJdbcUrl(System.getenv("JDBC_DATABASE_URL"));
-			final HikariDataSource dataSource = (config.getJdbcUrl() != null) ? new HikariDataSource(config)
-					: new HikariDataSource();
-
+			
+			class MyDataSource extends HikariDataSource {
+				public Connection getConnection() {
+					return getConnection2();
+				}
+			}
+			
+			final DataSource dataSource;
+			if(System.getenv("IS_LOCAL") != null &&
+					System.getenv("IS_LOCAL").equalsIgnoreCase("true")) {
+				System.err.println("Using Postgres DB from LOCAL");
+				dataSource = new MyDataSource();
+			} else {
+				HikariConfig config = new HikariConfig();
+				config.setJdbcUrl(System.getenv("JDBC_DATABASE_URL"));
+				dataSource = (config.getJdbcUrl() != null) ? new HikariDataSource(config)
+						: new HikariDataSource();
+			}
+			
 			get("/db", (req, res) -> {
 				Map<String, Object> attributes = new HashMap<>();
 				try (Connection connection = dataSource.getConnection()) {
@@ -116,6 +135,7 @@ public class Main {
 	public static String renderSQL(Map<String, Object> model, String templatePath) {
 		return new FreeMarkerEngine().render(new ModelAndView(model, templatePath));
 	}
+	
 	public static String renderSQL(String templatePath) {
 		return new FreeMarkerEngine().render(new ModelAndView(null, templatePath));
 	}
@@ -125,13 +145,14 @@ public class Main {
 			URI dbUri = new URI(System.getenv("JDBC_DATABASE_URL"));
 		    String username = dbUri.getUserInfo().split(":")[0];
 		    String password = dbUri.getUserInfo().split(":")[1];
-		    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+		    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
 
-	    return DriverManager.getConnection(dbUrl, username, password);
+		    return DriverManager.getConnection(dbUrl, username, password);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
+	
 
 }
