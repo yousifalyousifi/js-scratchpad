@@ -4,19 +4,15 @@ import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.stop;
 
-import java.io.PrintWriter;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -42,14 +38,7 @@ public class Main {
 			port(Integer.valueOf(System.getenv("PORT")));
 			staticFileLocation("/public");
 
-			get("/hello", (req, res) -> "Hello World");
-
 			get("/", (request, response) -> {
-				response.redirect("editor.html"); 
-				return null;
-			});
-
-			get("/editor", (request, response) -> {
 				response.redirect("editor.html"); 
 				return null;
 			});
@@ -71,27 +60,6 @@ public class Main {
 				dataSource = (config.getJdbcUrl() != null) ? new HikariDataSource(config)
 						: new HikariDataSource();
 			}
-			
-			get("/db", (req, res) -> {
-				Map<String, Object> attributes = new HashMap<>();
-				try (Connection connection = dataSource.getConnection()) {
-					Statement stmt = connection.createStatement();
-					stmt.executeUpdate("CREATE TABLE IF NOT EXISTS ticks (tick timestamp)");
-					stmt.executeUpdate("INSERT INTO ticks VALUES (now())");
-					ResultSet rs = stmt.executeQuery("SELECT tick FROM ticks");
-
-					ArrayList<String> output = new ArrayList<String>();
-					while (rs.next()) {
-						output.add("Read from DB: " + rs.getTimestamp("tick"));
-					}
-
-					attributes.put("results", output);
-					return new ModelAndView(attributes, "db.ftl");
-				} catch (Exception e) {
-					attributes.put("message", "There was an error: " + e);
-					return new ModelAndView(attributes, "error.ftl");
-				}
-			} , new FreeMarkerEngine());
 
 			get("/edit/save", (req, res) -> {
 				try (Connection connection = dataSource.getConnection()) {
