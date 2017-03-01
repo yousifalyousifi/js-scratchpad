@@ -12,7 +12,7 @@ function CodeRunner(outputId) {
 
 	function replaceConsole(outputId) {
 		console.log("Replacing console.");
-		if (typeof console  != "undefined") 
+		if (typeof console  != "undefined") {
 		    if (typeof console.log != 'undefined') {
 		        console.olog = console.log;
 		        console.oerror = console.error;
@@ -20,7 +20,7 @@ function CodeRunner(outputId) {
 		    	console.olog = function() {};
 		    	console.oerror = function() {};
 		    }     
-
+		}
 		console.log = function(message) {
 		    console.olog(arguments);
 		    newconsole(arguments);
@@ -32,12 +32,15 @@ function CodeRunner(outputId) {
 		console.debug = console.info = console.log;
 	};
 
+	window.print = function() {
+		newconsole(arguments);
+	};
+
 	function newconsole(message) {
 		var args = arguments[0];
 		for(var i = 0; i < args.length; i++) {
 			var line = $(document.createElement("span"));
 			line.addClass("codeOutput");
-			console.olog("inspect  " + args[i]);
 			line.html(getHTMLForOutput(args[i]));
 			line.html(line.html() + " ");
 			appender(line);
