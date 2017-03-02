@@ -131,9 +131,7 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-
-<div id="editorContainer">
-<pre id="editor">
+<pre style="display: none;" id="defaultCode">
 function foo(items) {
     var i;
     for (i = 0; i &lt; items.length; i++) {
@@ -157,6 +155,10 @@ console.log("strrrrIng://", 123, true, foo);
 console.log(true);
 g();
 </pre>
+<div id="editorContainer">
+<pre id="editor">
+
+</pre>
 </div>
 <div id="displayContainer">
 <pre>
@@ -166,8 +168,10 @@ g();
 </div>
 <script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
     <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/jquery3.1.1.js"></script>
+    <script src="js/jquery.ba-throttle-debounce.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/RateLimit.js"></script>
     <script src="js/code-runner.js"></script>
@@ -177,6 +181,30 @@ g();
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/javascript");
+        window.editor2 = editor;
+        console.log("EDITOR2");
+        var storedCode = window.localStorage.getItem("code");
+        if (storedCode) {
+            editor.setValue(storedCode);
+        } else {
+            editor.setValue($("#defaultCode").text());
+        }
+        editor.gotoLine(editor.session.getLength() + 1);
+        editor.getSession().on('change', $.debounce( 1000, function(e) {
+            console.log("Changes saved.");
+            window.localStorage.setItem("code", editor.getValue());
+        }));
+        editor.commands.addCommand({
+            name: 'run',
+            bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
+            exec: function(editor) {
+                coderunner.runThis(editor.getValue());
+            },
+            readOnly: false // false if this command should not apply in readOnly mode
+        });
+
+
+
         var coderunner = new CodeRunner("displayContainer pre");
         $("#runButton").click(function() {
             coderunner.runThis(editor.getValue());
@@ -218,7 +246,62 @@ g();
         </div>
         <div class="modal-body">
             <div style="max-height: 300px; overflow: auto;">
-              
+                <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>John</td>
+        <td>Doe</td>
+        <td>john@example.com</td>
+      </tr>
+      <tr>
+        <td>Mary</td>
+        <td>Moe</td>
+        <td>mary@example.com</td>
+      </tr>
+      <tr>
+        <td>July</td>
+        <td>Dooley</td>
+        <td>july@example.com</td>
+      </tr>
+      <tr>
+        <td>John</td>
+        <td>Doe</td>
+        <td>john@example.com</td>
+      </tr>
+      <tr>
+        <td>Mary</td>
+        <td>Moe</td>
+        <td>mary@example.com</td>
+      </tr>
+      <tr>
+        <td>July</td>
+        <td>Dooley</td>
+        <td>july@example.com</td>
+      </tr>
+      <tr>
+        <td>John</td>
+        <td>Doe</td>
+        <td>john@example.com</td>
+      </tr>
+      <tr>
+        <td>Mary</td>
+        <td>Moe</td>
+        <td>mary@example.com</td>
+      </tr>
+      <tr>
+        <td>July</td>
+        <td>Dooley</td>
+        <td>july@example.com</td>
+      </tr> 
+    </tbody>
+  </table>
             </div>
         </div>
         <div class="modal-footer">
