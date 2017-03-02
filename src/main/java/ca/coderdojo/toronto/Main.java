@@ -11,11 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.google.gson.Gson;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -34,6 +34,8 @@ public class Main {
 	        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 	        cfg.setLogTemplateExceptions(false);
 	        final FreeMarkerEngine dbEngine = new FreeMarkerEngine(cfg);
+	        Gson gson = new Gson();
+			LessonsUtil.createTable();
 	        
 			port(Integer.valueOf(System.getenv("PORT")));
 			staticFileLocation("/public");
@@ -43,23 +45,8 @@ public class Main {
 				return null;
 			});
 			
-			class MyDataSource extends HikariDataSource {
-				public Connection getConnection() {
-					return getConnection2();
-				}
-			}
 			
-			final DataSource dataSource;
-			if(System.getenv("IS_LOCAL") != null &&
-					System.getenv("IS_LOCAL").equalsIgnoreCase("true")) {
-				System.err.println("Using Postgres DB from LOCAL");
-				dataSource = new MyDataSource();
-			} else {
-				HikariConfig config = new HikariConfig();
-				config.setJdbcUrl(System.getenv("JDBC_DATABASE_URL"));
-				dataSource = (config.getJdbcUrl() != null) ? new HikariDataSource(config)
-						: new HikariDataSource();
-			}
+			final DataSource dataSource = DatabaseUtil.getDatasource();
 
 			get("/edit/save", (req, res) -> {
 				try (Connection connection = dataSource.getConnection()) {
@@ -90,6 +77,52 @@ public class Main {
 					return e.getMessage();
 				}
 			});
+			
+			get("/lessons/get", (req, res) -> {
+				res.type("application/json");
+				try (Connection connection = dataSource.getConnection()) {
+					Statement stmt = connection.createStatement();
+					ResultSet rs = stmt.executeQuery("SELECT * FROM lessons;");
+					
+					ArrayList<Lesson> output = new ArrayList<Lesson>();
+					while (rs.next()) {
+						Lesson l = new Lesson();
+						l.setId(rs.getString("id"));
+						l.setTitle(rs.getString("title"));
+						l.setSnippet(rs.getString("snippet"));
+						output.add(l);
+					}
+					return output;
+				} catch (Exception e) {
+					return e.getMessage();
+				}
+			}, gson::toJson);
+			
+
+			get("/lessons/get/:lessonId", (req, res) -> {
+				System.out.println(req.params(":lessonId"));
+				res.type("application/json");
+				try (Connection connection = dataSource.getConnection()) {
+					PreparedStatement stmt = connection.prepareStatement("SELECT * FROM lessons WHERE id = ?;");
+					stmt.setInt(1, Integer.parseInt(req.params(":lessonId")));
+					ResultSet rs = stmt.executeQuery();
+
+					if (rs.next()) {
+						Lesson l = new Lesson();
+						l.setId(rs.getString("id"));
+						l.setTitle(rs.getString("title"));
+						l.setSnippet(rs.getString("snippet"));
+						return l;
+					} else {
+						res.status(404);
+					}
+					return null;
+				} catch (Exception e) {
+					return e.getMessage();
+				}
+			}, gson::toJson);
+			
+			
 
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -108,19 +141,6 @@ public class Main {
 		return new FreeMarkerEngine().render(new ModelAndView(null, templatePath));
 	}
 
-	private static Connection getConnection2() {
-		try {
-			URI dbUri = new URI(System.getenv("JDBC_DATABASE_URL"));
-		    String username = dbUri.getUserInfo().split(":")[0];
-		    String password = dbUri.getUserInfo().split(":")[1];
-		    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
-
-		    return DriverManager.getConnection(dbUrl, username, password);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 	
 
 }
