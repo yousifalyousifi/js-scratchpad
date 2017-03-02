@@ -9,8 +9,12 @@ function CodeRunner(outputId) {
 	};
 
 	var rateLimitedAppender = appender;//RateLimit(appender, 50);
+	var realConsoleLogFunction;
+	var realConsoleErrorFunction;
+	var fakeConsoleLogFunction;
+	var fakeConsoleErrorFunction;
 
-	function replaceConsole(outputId) {
+	function replaceConsole() {
 		console.log("Replacing console.");
 		if (typeof console  != "undefined") {
 		    if (typeof console.log != 'undefined') {
@@ -29,8 +33,20 @@ function CodeRunner(outputId) {
 		    console.oerror(message);
 		    newerror(message);
 		};
-		console.debug = console.info = console.log;
-	};
+	}
+
+	function restoreConsole() {
+		console.olog("Restoring console.");
+		if (typeof console  != "undefined") {
+		    if (typeof console.log != 'undefined') {
+		        console.log = console.olog;
+		        console.error = console.oerror;
+		    } else {
+		    	console.log = function() {};
+		    	console.error = function() {};
+		    }     
+		}
+	}
 
 	window.print = function() {
 		newconsole(arguments);
@@ -58,9 +74,12 @@ function CodeRunner(outputId) {
 
 	this.runThis = function(code) {
 		try {
+			replaceConsole();
 			eval(code);
 		} catch (e) {
 			handleException(e);
+		} finally {
+			restoreConsole();
 		}
 		insertCodeOutputSeparator();
 		scrollToBottom();
@@ -226,6 +245,5 @@ function CodeRunner(outputId) {
 		}
 	}
 
-	replaceConsole(outputId);
 
 }
