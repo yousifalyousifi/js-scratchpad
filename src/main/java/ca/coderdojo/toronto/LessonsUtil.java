@@ -28,6 +28,7 @@ public class LessonsUtil {
 					+ "id integer PRIMARY KEY, "
 					+ "title VARCHAR(100) NOT NULL, "
 					+ "snippet VARCHAR(5000) NOT NULL);");
+			System.out.println("Created Table");
 			try {
 				for (String filename : getResourceFiles(path)) {
 					System.out.println("File " + filename);
