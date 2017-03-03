@@ -30,6 +30,8 @@ public class LessonsUtil {
 					+ "snippet VARCHAR(5000) NOT NULL);");
 			System.out.println("Created Table");
 			try {
+				System.out.println(Arrays.toString(getResourceFiles(path).toArray()));
+				System.out.println(Arrays.toString(getResourceFiles("/").toArray()));
 				for (String filename : getResourceFiles(path)) {
 					System.out.println("File " + filename);
 					int separatorIndex = filename.indexOf('_');
