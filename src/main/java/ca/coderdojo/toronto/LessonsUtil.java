@@ -30,11 +30,13 @@ public class LessonsUtil {
 					+ "snippet VARCHAR(5000) NOT NULL);");
 			try {
 				for (String filename : getResourceFiles(path)) {
+					System.out.println("File " + filename);
 					int separatorIndex = filename.indexOf('_');
 					String title = filename.substring(separatorIndex+1, filename.length()-3);
 					String[] parts = filename.split("_");
 					String id = parts[0];
 					String snippet = getResourceFile(path + filename);
+					System.out.println(snippet);
 					PreparedStatement ps = connection.prepareStatement("INSERT INTO lessons VALUES (?, ?, ?);");
 					ps.setInt(1, Integer.parseInt(id));
 					ps.setString(2, title);
