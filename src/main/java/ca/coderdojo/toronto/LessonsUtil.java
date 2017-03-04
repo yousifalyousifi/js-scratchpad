@@ -2,21 +2,26 @@ package ca.coderdojo.toronto;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class LessonsUtil {
 
-	static String path = "lessons/";
+	static String path = "/lessons/";
 	
 	public static void createTable() {
 		
@@ -28,14 +33,14 @@ public class LessonsUtil {
 					+ "id integer PRIMARY KEY, "
 					+ "title VARCHAR(100) NOT NULL, "
 					+ "snippet VARCHAR(5000) NOT NULL);");
-			System.out.println("Created Table");
 			try {
-				System.out.println(Arrays.toString(getResourceFiles(path).toArray()));
-				System.out.println(Arrays.toString(getResourceFiles("/").toArray()));
-				for (String filename : getResourceFiles(path)) {
+				String[] lessonFileNames = {
+					"100_variables.js"
+				};
+				for (String filename : lessonFileNames) {
 					System.out.println("File " + filename);
 					int separatorIndex = filename.indexOf('_');
-					String title = filename.substring(separatorIndex+1, filename.length()-3);
+					String title = filename.substring(separatorIndex+1);
 					String[] parts = filename.split("_");
 					String id = parts[0];
 					String snippet = getResourceFile(path + filename);
@@ -55,27 +60,18 @@ public class LessonsUtil {
 		}
 	}
 
-	private static ArrayList<String> getFileNames() {
-		return null;
-	}
-
 	public static void main(String[] args) {
-		String path = "lessons/";
-		try {
-			System.out.println(Arrays.toString(getResourceFiles(path).toArray()));
-			for (String filename : getResourceFiles(path)) {
-				int separatorIndex = filename.indexOf('_');
-				String title = filename.substring(separatorIndex+1, filename.length()-3);
-				System.out.println(title);
-				String[] parts = filename.split("_");
-				String id = parts[0];
-				System.out.println(id);
-				System.out.println(getResourceFile(path + filename));
-			}
-			LessonsUtil.createTable();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			
+//			for (String filename : getResourceFiles(path)) {
+//				int separatorIndex = filename.indexOf('_');
+//				String title = filename.substring(separatorIndex+1, filename.length()-3);
+//				System.out.println(title);
+//				String[] parts = filename.split("_");
+//				String id = parts[0];
+//				System.out.println(id);
+//				System.out.println(getResourceFile(path + filename));
+//			}
+//			LessonsUtil.createTable();
 	}
 
 	private static String getResourceFile(String path) throws IOException {
@@ -109,11 +105,45 @@ public class LessonsUtil {
 
 	private static InputStream getResourceAsStream(String resource) {
 		final InputStream in = getContextClassLoader().getResourceAsStream(resource);
-
+		
 		return in == null ? LessonsUtil.class.getResourceAsStream(resource) : in;
 	}
 
 	private static ClassLoader getContextClassLoader() {
 		return Thread.currentThread().getContextClassLoader();
+	}
+	
+	//http://stackoverflow.com/a/20073154/1987694
+	public static List<String> getFolderContents(String path) {
+		try {
+			final File jarFile = new File(LessonsUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+			if(jarFile.isFile()) {  // Run with JAR file
+			    final JarFile jar = new JarFile(jarFile);
+			    final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+			    
+			    while(entries.hasMoreElements()) {
+			        final String name = entries.nextElement().getName();
+			        if (name.startsWith(path + "/")) { //filter according to the path
+			            System.out.println(name);
+			        }
+			    }
+			    jar.close();
+			} else { // Run with IDE
+			    final URL url = LessonsUtil.class.getResource(path);
+			    if (url != null) {
+			        try {
+			            final File apps = new File(url.toURI());
+			            for (File app : apps.listFiles()) {
+			                System.out.println(app.getName());
+			            }
+			        } catch (URISyntaxException ex) {
+			            // never happens
+			        }
+			    }
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
