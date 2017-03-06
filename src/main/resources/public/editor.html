@@ -129,6 +129,8 @@
                 <li><a id="font14px" href="#">14px</a></li>
                 <li><a id="font18px" href="#">18px</a></li>
                 <li><a id="font24px" href="#">24px</a></li>
+                <li role="separator" class="divider">
+                <li><a id="wordWrap" href="#">Enable Word Wrap</a></li>
               </ul>
             </li>
           </ul>
@@ -221,6 +223,16 @@ g();
         });
         $("#font24px").click(function() {
             editor.setFontSize(24);
+        });
+        var wordWrap = false;
+        $("#wordWrap").click(function() {
+            wordWrap = !wordWrap;
+            editor.getSession().setUseWrapMode(wordWrap);
+            if(wordWrap) {
+            	$("#wordWrap").text("Disable Word Wrap");
+            } else {
+            	$("#wordWrap").text("Enable Word Wrap");
+            }
         });
         $("#loadButton").click(function() {
         });
