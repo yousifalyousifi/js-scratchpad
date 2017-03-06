@@ -92,6 +92,10 @@
     .keyOutput {
         color: rgb(70,175,227);
     }
+
+    .selectableRow {
+    	cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -113,9 +117,9 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Code <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a id="loadButton" href="#" data-toggle="modal" data-target="#myModal">Lessons</a></li>
-                <li role="separator" class="divider"></li>
+                <!-- <li role="separator" class="divider"></li>
                 <li><a id="" href="#">Save</a></li>
-                <li><a id="" href="#">Save As</a></li>
+                <li><a id="" href="#">Save As</a></li> -->
                 </ul>
             </li>
             <li class="dropdown">
@@ -221,90 +225,85 @@ g();
         $("#loadButton").click(function() {
         });
 
-        // $.ajax({
-        //   method: "GET",
-        //   url: "/edit/load"
-        // })
-        //   .done(function( msg ) {
-        //     alert( "Data Saved: " + msg );
-        //     editor.setValue(msg);
-        //   })
-        //   .fail(function( msg ) {
-        //     alert( "Data Failed: " + msg );
-        //   });
+        function getLesson(lessonIndex) {
+            $.ajax({
+              method: "GET",
+              url: "/lessons/get/" + lessonIndex
+            })
+            .done(function( lesson ) {
+                console.log(lesson);
+                editor.setValue(lesson.snippet);
+                editor.gotoLine(editor.session.getLength() + 1);
+                $("#loadingGif").hide();
+                $('#myModal').modal('hide');
+            })
+            .fail(function( msg ) {
+              console.error("Failed to get lesson " + lessonIndex);
+              console.error( msg );
+            });
+        }
+
+        $.ajax({
+          method: "GET",
+          url: "/lessons/get"
+        })
+          .done(function( msg ) {
+            console.log(msg);
+            var lessons = msg;
+            var tableBody = $("#lessonsTableBody");
+            for(var i = 0; i < lessons.length; i++) {
+                var row = document.createElement("tr");
+                var id = document.createElement("td");
+                var title = document.createElement("td");
+                var lessonId = lessons[i].id;
+                $(id).text(lessonId);
+                $(title).text(lessons[i].title);
+                $(row).append(id).append(title);
+                $(row).attr('id', lessonId);
+                $(row).addClass("selectableRow");
+                (function(l_id) {
+                    $(row).click(function() {
+                		$("#loadingGif").show();
+                        getLesson(l_id);
+                    });
+                })(lessonId);
+                
+                $(tableBody).append(row);
+            }
+          })
+          .fail(function( msg ) {
+            console.error("Failed to get lessons...");
+            console.error( msg );
+          });
     });
     </script>
      <!-- Modal -->
   <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
     
-      <!-- Modal content-->
+      <!-- Modal content--> 
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header"> 
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title">Lessons</h4>
+          <span id="lessonLoading">
         </div>
         <div class="modal-body">
             <div style="max-height: 300px; overflow: auto;">
                 <table class="table table-hover">
     <thead>
       <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>Email</th>
+        <th>Lesson Number</th>
+        <th>Lesson Title</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
-      </tr>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
-      </tr>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
-      </tr> 
+    <tbody id="lessonsTableBody">
     </tbody>
   </table>
             </div>
         </div>
         <div class="modal-footer">
+          <span id="loadingGif" style="display:none;margin-right:20px;"><img src="loading.gif"/></span>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
