@@ -76,7 +76,7 @@
 					<appendAssemblyId>false</appendAssemblyId>
 					<archive>
 						<manifest>
-							<mainClass>ca.coderdojo.toronto.Main</mainClass>
+							<mainClass>jsscratchpad.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
