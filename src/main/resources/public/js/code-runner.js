@@ -27,7 +27,7 @@ function CodeRunner(outputId) {
 		}
 		console.log = function(message) {
 		    console.olog(arguments);
-		    newconsole(arguments);
+		    newlog(arguments);
 		};
 		console.error = function(message) {
 		    console.oerror(message);
@@ -49,10 +49,10 @@ function CodeRunner(outputId) {
 	}
 
 	window.print = function() {
-		newconsole(arguments);
+		newlog(arguments);
 	};
 
-	function newconsole(message) {
+	function newlog(message) {
 		var args = arguments[0];
 		for(var i = 0; i < args.length; i++) {
 			var line = $(document.createElement("span"));

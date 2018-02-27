@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>CoderDojo JS Editor</title>
+    <title>JS Scratchpad</title>
     <link href="css/bootstrap.min.cyborg.css" rel="stylesheet">
     <style type="text/css" media="screen">
     body {
@@ -108,7 +108,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">CoderDojo Javascript Scratchpad</a>
+          <a class="navbar-brand" href="#">Javascript Scratchpad</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -209,8 +209,6 @@ g();
             readOnly: false // false if this command should not apply in readOnly mode
         });
 
-
-
         var coderunner = new CodeRunner("displayContainer pre");
         $("#runButton").click(function() {
             coderunner.runThis(editor.getValue());
@@ -254,7 +252,7 @@ g();
               console.error( msg );
             });
         }
-
+        
         $.ajax({
           method: "GET",
           url: "/lessons/get"
