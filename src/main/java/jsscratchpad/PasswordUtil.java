@@ -1,6 +1,5 @@
-package ca.coderdojo.toronto;
+package jsscratchpad;
 
-import java.security.SecureRandom;
 import java.util.UUID;
 
 import com.lambdaworks.crypto.SCryptUtil;

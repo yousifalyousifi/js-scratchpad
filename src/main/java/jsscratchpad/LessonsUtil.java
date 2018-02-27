@@ -1,5 +1,4 @@
-package ca.coderdojo.toronto;
-
+package jsscratchpad;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

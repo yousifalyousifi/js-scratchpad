@@ -1,4 +1,4 @@
-package ca.coderdojo.toronto;
+package jsscratchpad;
 
 public class Lesson {
 	private String id;

@@ -1,4 +1,4 @@
-package ca.coderdojo.toronto;
+package jsscratchpad;
 
 import java.net.URI;
 import java.sql.Connection;
