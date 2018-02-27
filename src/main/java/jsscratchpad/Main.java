@@ -4,9 +4,7 @@ import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.stop;
 
-import java.net.URI;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -16,8 +14,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import com.google.gson.Gson;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;

@@ -19,7 +19,7 @@
     <a type="button" class="btn btn-lg btn-primary" href="https://github.com/heroku/java-getting-started"><span class="glyphicon glyphicon-download"></span> Source on GitHub</a>
   </div>
 </div>
-<div id="debigDiv"></div>
+<div id="debugDiv"></div>
 <script>
 
 if (typeof console  != "undefined") 

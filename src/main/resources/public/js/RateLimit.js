@@ -7,7 +7,7 @@ function RateLimit(fn, delay, context) {
     if (item)
       fn.apply(item.context, item.arguments);
     if (queue.length === 0) {
-      console.olog("CLREARING");
+      console.olog("CLEARING");
       clearInterval(timer);
       timer = null;
     }
