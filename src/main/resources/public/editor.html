@@ -1,142 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>JS Scratchpad</title>
-    <link href="css/bootstrap.min.cyborg.css" rel="stylesheet">
-    <style type="text/css" media="screen">
-    body {
-        overflow: hidden;
-    }
-    .wideNavBar {
-        width: 96%;
-    }
-    #editor {
-        border-style: none;
-        margin: 0;
-        position: absolute;
-        top: 10px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
-    #editorContainer {
-        background-color: rgb(39,40,34);
-        margin: 0;
-        position: absolute;
-        top: 70px;
-        bottom: 0px;
-        left: 0;
-        right: 51%;
-    }
-    #displayContainer {
-        overflow: auto;
-        background-color: rgb(56,57,49);
-        margin: 0;
-        position: absolute;
-        top: 70px;
-        bottom: 0px;
-        left: 50%;
-        right: 0px;
-    }
-    #displayContainer pre {
-        color: lightgrey;
-        border-style: none;
-        background-color: rgb(39,40,34);
-        overflow: auto;
-        margin: 0;
-        position: absolute;
-        top: 0px;
-        bottom: 0px;
-        left: 0;
-        right: 0px;
-    }
-    #header {
-        background-color: black;
-        margin: 0;
-        position: absolute;
-        top: 0px;
-        height: 70px;
-    }
-    .codeOutputError {
-        color: rgb(216, 212, 212);
-        display: inline-block;
-        margin: 2px 0px;
-        background-color: rgba(255, 0, 0, 0.43);
-    }
-    .codeOutput {
-        display: inline-block;
-        margin: 2px 0px;
-        color: grey;
-    }
-    .codeRunSeparator {
-        border-color: grey;
-    }
-    .stringOutput {
-        color: rgb(217,155,40);
-    }
-    .numberOutput {
-        color: rgb(112,191,83);
-    }
-    .booleanOutput {
-        color: rgb(235,83,104);
-    }
-    .typePrefixOutput {
-        font-style: italic;
-        color: rgb(70,175,227);
-    }
-    .greyOutput {
-        color: rgb(180,161,178);
-    }
-    .keyOutput {
-        color: rgb(70,175,227);
-    }
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>JS Scratchpad</title>
+        <link href="css/bootstrap.min.cyborg.css" rel="stylesheet">
+        <style type="text/css" media="screen">
+            body {
+                overflow: hidden;
+            }
+            .wideNavBar {
+                width: 96%;
+            }
+            #editor {
+                border-style: none;
+                margin: 0;
+                position: absolute;
+                top: 10px;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+            #editorContainer {
+                background-color: rgb(39,40,34);
+                margin: 0;
+                position: absolute;
+                top: 70px;
+                bottom: 0px;
+                left: 0;
+                right: 51%;
+            }
+            #displayContainer {
+                overflow: auto;
+                background-color: rgb(56,57,49);
+                margin: 0;
+                position: absolute;
+                top: 70px;
+                bottom: 0px;
+                left: 50%;
+                right: 0px;
+            }
+            #displayContainer pre {
+                color: lightgrey;
+                border-style: none;
+                background-color: rgb(39,40,34);
+                overflow: auto;
+                margin: 0;
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                left: 0;
+                right: 0px;
+            }
+            #header {
+                background-color: black;
+                margin: 0;
+                position: absolute;
+                top: 0px;
+                height: 70px;
+            }
+            .codeOutputError {
+                color: rgb(216, 212, 212);
+                display: inline-block;
+                margin: 2px 0px;
+                background-color: rgba(255, 0, 0, 0.43);
+            }
+            .codeOutput {
+                display: inline-block;
+                margin: 2px 0px;
+                color: grey;
+            }
+            .codeRunSeparator {
+                border-color: grey;
+            }
+            .stringOutput {
+                color: rgb(217,155,40);
+            }
+            .numberOutput {
+                color: rgb(112,191,83);
+            }
+            .booleanOutput {
+                color: rgb(235,83,104);
+            }
+            .typePrefixOutput {
+                font-style: italic;
+                color: rgb(70,175,227);
+            }
+            .greyOutput {
+                color: rgb(180,161,178);
+            }
+            .keyOutput {
+                color: rgb(70,175,227);
+            }
 
-    .selectableRow {
-    	cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-<nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container wideNavBar">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Javascript Scratchpad</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li id="runButton"><a href="#">Run</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Code <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a id="loadButton" href="#" data-toggle="modal" data-target="#myModal">Lessons</a></li>
-                <!-- <li role="separator" class="divider"></li>
-                <li><a id="" href="#">Save</a></li>
-                <li><a id="" href="#">Save As</a></li> -->
-                </ul>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">View <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li class="dropdown-header">Font Size</li>
-                <li><a id="font14px" href="#">14px</a></li>
-                <li><a id="font18px" href="#">18px</a></li>
-                <li><a id="font24px" href="#">24px</a></li>
-                <li role="separator" class="divider">
-                <li><a id="wordWrap" href="#">Enable Word Wrap</a></li>
+            .selectableRow {
+            	cursor: pointer;
+            }
+      </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container wideNavBar">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">Javascript Scratchpad</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li id="runButton"><a href="#">Run</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Code <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li><a id="loadButton" href="#" data-toggle="modal" data-target="#myModal">Lessons</a></li>
+                    <!-- <li role="separator" class="divider"></li>
+                    <li><a id="" href="#">Save</a></li>
+                    <li><a id="" href="#">Save As</a></li> -->
+                    </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">View <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li class="dropdown-header">Font Size</li>
+                    <li><a id="font14px" href="#">14px</a></li>
+                    <li><a id="font18px" href="#">18px</a></li>
+                    <li><a id="font24px" href="#">24px</a></li>
+                    <li role="separator" class="divider">
+                    <li><a id="wordWrap" href="#">Enable Word Wrap</a></li>
+                  </ul>
+                </li>
               </ul>
-            </li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+            </div><!--/.nav-collapse -->
+          </div>
+        </nav>
 <pre style="display: none;" id="defaultCode">
 function foo(items) {
     var i;
@@ -161,164 +161,158 @@ console.log("strrrrIng://", 123, true, foo);
 console.log(true);
 g();
 </pre>
-<div id="editorContainer">
-<pre id="editor">
+        <div id="editorContainer">
+            <pre id="editor">
 
-</pre>
-</div>
-<div id="displayContainer">
+            </pre>
+        </div>
+        <div id="displayContainer">
 <pre>
 <span>Console Output</span>
 <hr style="margin:0;" class="codeRunSeparator"/>
 </pre>
-</div>
-<script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/jquery3.1.1.js"></script>
-    <script src="js/jquery.ba-throttle-debounce.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/RateLimit.js"></script>
-    <script src="js/code-runner.js"></script>
-    <script>
-    $(document).ready(function() {
-
-        var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/monokai");
-        editor.session.setMode("ace/mode/javascript");
-        window.editor2 = editor;
-        console.log("EDITOR2");
-        var storedCode = window.localStorage.getItem("code");
-        if (storedCode) {
-            editor.setValue(storedCode);
-        } else {
-            editor.setValue($("#defaultCode").text());
-        }
-        editor.gotoLine(editor.session.getLength() + 1);
-        editor.getSession().on('change', $.debounce( 1000, function(e) {
-            console.log("Changes saved.");
-            window.localStorage.setItem("code", editor.getValue());
-        }));
-        editor.commands.addCommand({
-            name: 'run',
-            bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
-            exec: function(editor) {
-                coderunner.runThis(editor.getValue());
-            },
-            readOnly: false // false if this command should not apply in readOnly mode
-        });
-
-        var coderunner = new CodeRunner("displayContainer pre");
-        $("#runButton").click(function() {
-            coderunner.runThis(editor.getValue());
-        });
-        $("#font14px").click(function() {
-            editor.setFontSize(14);
-        });
-        $("#font18px").click(function() {
-            editor.setFontSize(18);
-        });
-        $("#font24px").click(function() {
-            editor.setFontSize(24);
-        });
-        var wordWrap = false;
-        $("#wordWrap").click(function() {
-            wordWrap = !wordWrap;
-            editor.getSession().setUseWrapMode(wordWrap);
-            if(wordWrap) {
-            	$("#wordWrap").text("Disable Word Wrap");
-            } else {
-            	$("#wordWrap").text("Enable Word Wrap");
-            }
-        });
-        $("#loadButton").click(function() {
-        });
-
-        function getLesson(lessonIndex) {
-            $.ajax({
-              method: "GET",
-              url: "/lessons/get/" + lessonIndex
-            })
-            .done(function( lesson ) {
-                console.log(lesson);
-                editor.setValue(lesson.snippet);
-                editor.gotoLine(editor.session.getLength() + 1);
-                $("#loadingGif").hide();
-                $('#myModal').modal('hide');
-            })
-            .fail(function( msg ) {
-              console.error("Failed to get lesson " + lessonIndex);
-              console.error( msg );
-            });
-        }
-        
-        $.ajax({
-          method: "GET",
-          url: "/lessons/get"
-        })
-          .done(function( msg ) {
-            console.log(msg);
-            var lessons = msg;
-            var tableBody = $("#lessonsTableBody");
-            for(var i = 0; i < lessons.length; i++) {
-                var row = document.createElement("tr");
-                var id = document.createElement("td");
-                var title = document.createElement("td");
-                var lessonId = lessons[i].id;
-                $(id).text(lessonId);
-                $(title).text(lessons[i].title);
-                $(row).append(id).append(title);
-                $(row).attr('id', lessonId);
-                $(row).addClass("selectableRow");
-                (function(l_id) {
-                    $(row).click(function() {
-                		$("#loadingGif").show();
-                        getLesson(l_id);
-                    });
-                })(lessonId);
-                
-                $(tableBody).append(row);
-            }
-          })
-          .fail(function( msg ) {
-            console.error("Failed to get lessons...");
-            console.error( msg );
-          });
-    });
-    </script>
-     <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content--> 
-      <div class="modal-content">
-        <div class="modal-header"> 
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Lessons</h4>
-          <span id="lessonLoading">
         </div>
-        <div class="modal-body">
-            <div style="max-height: 300px; overflow: auto;">
-                <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Lesson Number</th>
-        <th>Lesson Title</th>
-      </tr>
-    </thead>
-    <tbody id="lessonsTableBody">
-    </tbody>
-  </table>
+        <script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/jquery/jquery3.1.1.js"></script>
+        <script src="js/jquery/jquery.ba-throttle-debounce.min.js"></script>
+        <script src="js/bootstrap/bootstrap.min.js"></script>
+        <script src="js/RateLimit.js"></script>
+        <script src="js/code-runner.js"></script>
+        <script>
+            $(document).ready(function() {
+
+                var editor = ace.edit("editor");
+                editor.setTheme("ace/theme/monokai");
+                editor.session.setMode("ace/mode/javascript");
+                window.editor2 = editor;
+                console.log("EDITOR2");
+                var storedCode = window.localStorage.getItem("code");
+                if (storedCode) {
+                    editor.setValue(storedCode);
+                } else {
+                    editor.setValue($("#defaultCode").text());
+                }
+                editor.gotoLine(editor.session.getLength() + 1);
+                editor.getSession().on('change', $.debounce( 1000, function(e) {
+                    console.log("Changes saved.");
+                    window.localStorage.setItem("code", editor.getValue());
+                }));
+                editor.commands.addCommand({
+                    name: 'run',
+                    bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
+                    exec: function(editor) {
+                        coderunner.runThis(editor.getValue());
+                    },
+                    readOnly: false // false if this command should not apply in readOnly mode
+                });
+
+                var coderunner = new CodeRunner("displayContainer pre");
+                $("#runButton").click(function() {
+                    coderunner.runThis(editor.getValue());
+                });
+                $("#font14px").click(function() {
+                    editor.setFontSize(14);
+                });
+                $("#font18px").click(function() {
+                    editor.setFontSize(18);
+                });
+                $("#font24px").click(function() {
+                    editor.setFontSize(24);
+                });
+                var wordWrap = false;
+                $("#wordWrap").click(function() {
+                    wordWrap = !wordWrap;
+                    editor.getSession().setUseWrapMode(wordWrap);
+                    if(wordWrap) {
+                    	$("#wordWrap").text("Disable Word Wrap");
+                    } else {
+                    	$("#wordWrap").text("Enable Word Wrap");
+                    }
+                });
+                $("#loadButton").click(function() {
+                });
+
+                function getLesson(lessonIndex) {
+                    $.ajax({
+                      method: "GET",
+                      url: "/lessons/get/" + lessonIndex
+                    })
+                    .done(function( lesson ) {
+                        console.log(lesson);
+                        editor.setValue(lesson.snippet);
+                        editor.gotoLine(editor.session.getLength() + 1);
+                        $("#loadingGif").hide();
+                        $('#myModal').modal('hide');
+                    })
+                    .fail(function( msg ) {
+                      console.error("Failed to get lesson " + lessonIndex);
+                      console.error( msg );
+                    });
+                }
+                
+                $.ajax({
+                  method: "GET",
+                  url: "/lessons/get"
+                })
+                  .done(function( msg ) {
+                    console.log(msg);
+                    var lessons = msg;
+                    var tableBody = $("#lessonsTableBody");
+                    for(var i = 0; i < lessons.length; i++) {
+                        var row = document.createElement("tr");
+                        var id = document.createElement("td");
+                        var title = document.createElement("td");
+                        var lessonId = lessons[i].id;
+                        $(id).text(lessonId);
+                        $(title).text(lessons[i].title);
+                        $(row).append(id).append(title);
+                        $(row).attr('id', lessonId);
+                        $(row).addClass("selectableRow");
+                        (function(l_id) {
+                            $(row).click(function() {
+                        		$("#loadingGif").show();
+                                getLesson(l_id);
+                            });
+                        })(lessonId);
+                        
+                        $(tableBody).append(row);
+                    }
+                  })
+                  .fail(function( msg ) {
+                    console.error("Failed to get lessons...");
+                    console.error( msg );
+                  });
+            });
+        </script>
+         <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"> 
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Lessons</h4>
+                        <span id="lessonLoading">
+                    </div>
+                    <div class="modal-body">
+                        <div style="max-height: 300px; overflow: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                <th>Lesson Number</th>
+                                <th>Lesson Title</th>
+                                </tr>
+                                </thead>
+                                <tbody id="lessonsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <span id="loadingGif" style="display:none;margin-right:20px;"><img src="loading.gif"/></span>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="modal-footer">
-          <span id="loadingGif" style="display:none;margin-right:20px;"><img src="loading.gif"/></span>
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-</body>
+    </body>
 </html>
