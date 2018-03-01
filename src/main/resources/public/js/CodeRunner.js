@@ -1,11 +1,11 @@
-function CodeRunner(outputId) {
+function CodeRunner(jQSelector) { //The selector should point to a <pre>
 
 	var me = this;
 	
-	this.outputId = outputId;
+	this.jQSelector = jQSelector;
 
 	function appender(line) {
-		$('#' + me.outputId).append(line);
+		$(me.jQSelector).append(line);
 	};
 
 	var rateLimitedAppender = appender;//RateLimit(appender, 50);
@@ -88,13 +88,13 @@ function CodeRunner(outputId) {
 	function insertCodeOutputSeparator() {
 		var line = $(document.createElement("hr"));
 		line.addClass("codeRunSeparator");
-		$('#' + me.outputId).append(line);
+		$(me.jQSelector).append(line);
 	}
 
 	function scrollToBottom() {
-		// var d = $('#' + me.outputId);
+		// var d = $(me.jQSelector);
 		// d.scrollTop(d.prop("scrollHeight"));
-		$('#' + me.outputId).animate({ scrollTop: $('#' + me.outputId).prop("scrollHeight")}, 500);
+		$(me.jQSelector).animate({ scrollTop: $(me.jQSelector).prop("scrollHeight")}, 500);
 	};
 
 	function getHTMLForOutput(value, withQuotesIfString) {
