@@ -38,6 +38,7 @@ body {
     background-color: rgb(39,40,34);
     overflow: auto;
     margin: 0;
+    padding: 9.5px;
     position: absolute;
     top: 0px;
     bottom: 0px;

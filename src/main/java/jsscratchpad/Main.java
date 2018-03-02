@@ -35,12 +35,11 @@ public class Main {
 	        
 			port(Integer.valueOf(System.getenv("PORT")));
 			staticFileLocation("/public");
-
+			
 			get("/", (request, response) -> {
 				response.redirect("editor.html"); 
 				return null;
 			});
-			
 			
 			final DataSource dataSource = DatabaseUtil.getDatasource();
 

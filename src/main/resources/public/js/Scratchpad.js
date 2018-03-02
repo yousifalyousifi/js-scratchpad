@@ -65,7 +65,7 @@ $(document).ready(function() {
     function getLesson(lessonIndex) {
         $.ajax({
           method: "GET",
-          url: "/lessons/get/"
+          url: "/lessons/get/" + lessonIndex
         })
         .done(function( lesson ) {
             console.log(lesson);
