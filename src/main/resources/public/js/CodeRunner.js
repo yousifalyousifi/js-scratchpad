@@ -49,7 +49,7 @@ function CodeRunner(jQSelector) { //The selector should point to a <pre>
 	}
 
 	window.print = function() {
-		newlog(arguments);
+		console.log(arguments);
 	};
 
 	function newlog(message) {

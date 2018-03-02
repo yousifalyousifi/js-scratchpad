@@ -4,6 +4,12 @@ body {
 .wideNavBar {
     width: 96%;
 }
+.dropdown-menu {
+    border: 1px solid #595959;
+}
+.dropdown-divider {
+    border-top: 1px solid #595959;
+}
 #editor {
     border-style: none;
     margin: 0;
@@ -24,7 +30,7 @@ body {
 }
 #displayContainer {
     overflow: auto;
-    background-color: rgb(56,57,49);
+    background-color: rgb(39,40,34);
     margin: 0;
     position: absolute;
     top: 70px;

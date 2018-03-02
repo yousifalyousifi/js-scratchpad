@@ -1,6 +1,16 @@
 $(document).ready(function() {
+    
+    var that = this;
+    var mode = undefined;
+
+    var codeRunner = new CodeRunner("#displayContainer pre");
+    var drawRunner = new DrawRunner("p5Container");
+    var runner = codeRunner; 
+
+    consoleMode();
 
     var editor = ace.edit("editor");
+
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/javascript");
 
@@ -19,36 +29,33 @@ $(document).ready(function() {
         name: 'run',
         bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
         exec: function(editor) {
-            coderunner.runThis(editor.getValue());
+            that.runThis(editor.getValue());
         },
         readOnly: false // false if this command should not apply in readOnly mode
     });
 
-    function wsUrl(path) {
-	    let l = window.location;
-	    let protocol = ((l.protocol === "https:") ? "wss://" : "ws://");
-	    let hostname = l.hostname;
-	    let port = ((l.port != 80) && (l.port != 443)) ? ":" + l.port : "";
-	    return protocol + hostname + port + path;
-    }
+    getLessons();
 
-    var coderunner = new CodeRunner("#displayContainer pre");
     $("#runButton").click(function() {
-        coderunner.runThis(editor.getValue());
+        that.runThis(editor.getValue());
     });
+
     $("#font14px").click(function() {
         editor.setFontSize(14);
         $("#displayContainer span").css("font-size", "14px");
 
     });
+
     $("#font18px").click(function() {
         editor.setFontSize(18);
         $("#displayContainer span").css("font-size", "18px");
     });
+
     $("#font24px").click(function() {
         editor.setFontSize(24);
         $("#displayContainer span").css("font-size", "24px");
     });
+
     var wordWrap = false;
     $("#wordWrap").click(function() {
         wordWrap = !wordWrap;
@@ -59,8 +66,44 @@ $(document).ready(function() {
         	$("#wordWrap").text("Enable Word Wrap");
         }
     });
-    $("#loadButton").click(function() {
+
+    $("#consoleMode").click(function() {
+    	consoleMode();
     });
+
+    $("#drawMode").click(function() {
+    	drawMode();
+    });
+
+    function consoleMode() {
+    	if(mode == "console") {return;}
+    	mode = "console";
+    	runner = codeRunner;
+		var consoleHTML = 
+		'<pre>'+
+		'<span>Console Output</span>'+
+		'<hr style="margin:0;" class="codeRunSeparator"/>'+
+		'</pre>';
+
+    	$("#displayContainer").html(consoleHTML);
+    }
+    function drawMode() {
+    	if(mode == "draw") {return;}
+    	$("#p5Container").html("");
+    	var drawHTML = 
+		'<pre>'+
+		'<span>Canvas</span>' +
+		'<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>' +
+		'<div id="p5Container"/>'+
+		'</pre>';
+    	$("#displayContainer").html(drawHTML);
+    	mode = "draw";
+    	runner = drawRunner;
+    }
+
+    this.runThis = function(code) {
+    	runner.runThis(code);
+    };
 
     function getLesson(lessonIndex) {
         $.ajax({
@@ -80,36 +123,46 @@ $(document).ready(function() {
         });
     }
     
-    $.ajax({
-      method: "GET",
-      url: "/lessons/get"
-    })
-      .done(function( msg ) {
-        console.log(msg);
-        var lessons = msg;
-        var tableBody = $("#lessonsTableBody");
-        for(var i = 0; i < lessons.length; i++) {
-            var row = document.createElement("tr");
-            var id = document.createElement("td");
-            var title = document.createElement("td");
-            var lessonId = lessons[i].id;
-            $(id).text(lessonId);
-            $(title).text(lessons[i].title);
-            $(row).append(id).append(title);
-            $(row).attr('id', lessonId);
-            $(row).addClass("selectableRow");
-            (function(l_id) {
-                $(row).click(function() {
-            		$("#loadingGif").show();
-                    getLesson(l_id);
-                });
-            })(lessonId);
-            
-            $(tableBody).append(row);
-        }
-      })
-      .fail(function( msg ) {
-        console.error("Failed to get lessons...");
-        console.error( msg );
-      });
+    function getLessons() {
+	    $.ajax({
+	      method: "GET",
+	      url: "/lessons/get"
+	    })
+	      .done(function( msg ) {
+	        console.log(msg);
+	        var lessons = msg;
+	        var tableBody = $("#lessonsTableBody");
+	        for(var i = 0; i < lessons.length; i++) {
+	            var row = document.createElement("tr");
+	            var id = document.createElement("td");
+	            var title = document.createElement("td");
+	            var lessonId = lessons[i].id;
+	            $(id).text(lessonId);
+	            $(title).text(lessons[i].title);
+	            $(row).append(id).append(title);
+	            $(row).attr('id', lessonId);
+	            $(row).addClass("selectableRow");
+	            (function(l_id) {
+	                $(row).click(function() {
+	            		$("#loadingGif").show();
+	                    getLesson(l_id);
+	                });
+	            })(lessonId);
+	            
+	            $(tableBody).append(row);
+	        }
+	      })
+	      .fail(function( msg ) {
+	        console.error("Failed to get lessons...");
+	        console.error( msg );
+	    });
+	}
+
+    function wsUrl(path) {
+	    let l = window.location;
+	    let protocol = ((l.protocol === "https:") ? "wss://" : "ws://");
+	    let hostname = l.hostname;
+	    let port = ((l.port != 80) && (l.port != 443)) ? ":" + l.port : "";
+	    return protocol + hostname + port + path;
+    }
 });
