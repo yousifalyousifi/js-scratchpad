@@ -1,6 +1,6 @@
 package jsscratchpad;
 
-public class Lesson {
+public class Snippet {
 	private String id;
 	private String title;
 	private String snippet;

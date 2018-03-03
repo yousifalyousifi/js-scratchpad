@@ -17,37 +17,37 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class LessonsUtil {
+public class SnippetsUtil {
 
-	static String path = "/lessons/";
+	static String path = "/snippets/";
 	
 	public static void createTable() {
 		
 		try (Connection connection = DatabaseUtil.getDatasource().getConnection()) {
 
 			Statement stmt = connection.createStatement();
-			stmt.execute("DROP TABLE IF EXISTS lessons;");
-			stmt.execute("CREATE TABLE lessons("
+			stmt.execute("DROP TABLE IF EXISTS snippets;");
+			stmt.execute("CREATE TABLE snippets("
 					+ "id integer PRIMARY KEY, "
 					+ "title VARCHAR(100) NOT NULL, "
 					+ "snippet VARCHAR(5000) NOT NULL);");
 			try {
-				String[] lessonFileNames = {
+				String[] snippetFileNames = {
 					"001_console.js",
 					"002_variables.js",
 					"003_strings.js",
-					"100_variables.js",
+					"100_missing_variable.js",
 					"101_adding_strings.js",
 					"500_p5_2D_template.js",
 					"600_p5_3D_template.js"
 				};
-				for (String filename : lessonFileNames) {
+				for (String filename : snippetFileNames) {
 					int separatorIndex = filename.indexOf('_');
 					String title = filename.substring(separatorIndex+1);
 					String[] parts = filename.split("_");
 					String id = parts[0];
 					String snippet = getResourceFile(path + filename);
-					PreparedStatement ps = connection.prepareStatement("INSERT INTO lessons VALUES (?, ?, ?);");
+					PreparedStatement ps = connection.prepareStatement("INSERT INTO snippets VALUES (?, ?, ?);");
 					ps.setInt(1, Integer.parseInt(id));
 					ps.setString(2, title);
 					ps.setString(3, snippet);
@@ -108,7 +108,7 @@ public class LessonsUtil {
 	private static InputStream getResourceAsStream(String resource) {
 		final InputStream in = getContextClassLoader().getResourceAsStream(resource);
 		
-		return in == null ? LessonsUtil.class.getResourceAsStream(resource) : in;
+		return in == null ? SnippetsUtil.class.getResourceAsStream(resource) : in;
 	}
 
 	private static ClassLoader getContextClassLoader() {
@@ -118,7 +118,7 @@ public class LessonsUtil {
 	//http://stackoverflow.com/a/20073154/1987694
 	public static List<String> getFolderContents(String path) {
 		try {
-			final File jarFile = new File(LessonsUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+			final File jarFile = new File(SnippetsUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 			if(jarFile.isFile()) {  // Run with JAR file
 			    final JarFile jar = new JarFile(jarFile);
 			    final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
@@ -131,7 +131,7 @@ public class LessonsUtil {
 			    }
 			    jar.close();
 			} else { // Run with IDE
-			    final URL url = LessonsUtil.class.getResource(path);
+			    final URL url = SnippetsUtil.class.getResource(path);
 			    if (url != null) {
 			        try {
 			            final File apps = new File(url.toURI());

@@ -27,7 +27,7 @@
                             Snippets
                         </a>
                         <div class="dropdown-menu" aria-labelledby="snippetsDropdown">
-                            <a id="loadButton" class="dropdown-item" href="#" data-toggle="modal" data-target="#myModal">Lessons</a>
+                            <a id="loadButton" class="dropdown-item" href="#" data-toggle="modal" data-target="#myModal">Snippets</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -108,26 +108,26 @@ function draw() {
         <script src="js/CodeRunner.js"></script>
         <script src="js/DrawRunner.js"></script>
         <script src="js/Scratchpad.js"></script>
-        <div class="modal fade" id="myModal" role="dialog" aria-labelledby="lessonsModalTitle" aria-hidden="true">
+        <div class="modal fade" id="myModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header"> 
-                        <h4 class="modal-title" id="lessonsModalTitle">Lessons</h4>
+                        <h4 class="modal-title" id="snippetsModalTitle">Snippets</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <span id="lessonLoading"></span>
+                        <span id="snippetLoading"></span>
                     </div>
                     <div class="modal-body">
                         <div style="max-height: 300px; overflow: auto;">
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                <th>Lesson Number</th>
-                                <th>Lesson Title</th>
+                                <th>Snippet Number</th>
+                                <th>Snippet Title</th>
                                 </tr>
                                 </thead>
-                                <tbody id="lessonsTableBody">
+                                <tbody id="snippetsTableBody">
                                 </tbody>
                             </table>
                         </div>

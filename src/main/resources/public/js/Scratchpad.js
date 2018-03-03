@@ -36,7 +36,7 @@ $(document).ready(function() {
     });
 
     setFontSize(currentFontSize);
-    getLessons();
+    getSnippets();
 
     function setFontSize(size) {
         editor.setFontSize(size);
@@ -117,55 +117,55 @@ $(document).ready(function() {
     	runner.runThis(code);
     };
 
-    function getLesson(lessonIndex) {
+    function getSnippet(snippetIndex) {
         $.ajax({
           method: "GET",
-          url: "/lessons/get/" + lessonIndex
+          url: "/snippets/get/" + snippetIndex
         })
-        .done(function( lesson ) {
-            console.log(lesson);
-            editor.setValue(lesson.snippet);
+        .done(function( snippet ) {
+            console.log(snippet);
+            editor.setValue(snippet.snippet);
             editor.gotoLine(editor.session.getLength() + 1);
             $("#loadingGif").hide();
             $('#myModal').modal('hide');
         })
         .fail(function( msg ) {
-          console.error("Failed to get lesson " + lessonIndex);
+          console.error("Failed to get snippet " + snippetIndex);
           console.error( msg );
         });
     }
     
-    function getLessons() {
+    function getSnippets() {
 	    $.ajax({
 	      method: "GET",
-	      url: "/lessons/get"
+	      url: "/snippets/get"
 	    })
 	      .done(function( msg ) {
 	        console.log(msg);
-	        var lessons = msg;
-	        var tableBody = $("#lessonsTableBody");
-	        for(var i = 0; i < lessons.length; i++) {
+	        var snippets = msg;
+	        var tableBody = $("#snippetsTableBody");
+	        for(var i = 0; i < snippets.length; i++) {
 	            var row = document.createElement("tr");
 	            var id = document.createElement("td");
 	            var title = document.createElement("td");
-	            var lessonId = lessons[i].id;
-	            $(id).text(lessonId);
-	            $(title).text(lessons[i].title);
+	            var snippetId = snippets[i].id;
+	            $(id).text(snippetId);
+	            $(title).text(snippets[i].title);
 	            $(row).append(id).append(title);
-	            $(row).attr('id', lessonId);
+	            $(row).attr('id', snippetId);
 	            $(row).addClass("selectableRow");
 	            (function(l_id) {
 	                $(row).click(function() {
 	            		$("#loadingGif").show();
-	                    getLesson(l_id);
+	                    getSnippet(l_id);
 	                });
-	            })(lessonId);
+	            })(snippetId);
 	            
 	            $(tableBody).append(row);
 	        }
 	      })
 	      .fail(function( msg ) {
-	        console.error("Failed to get lessons...");
+	        console.error("Failed to get snippets...");
 	        console.error( msg );
 	    });
 	}

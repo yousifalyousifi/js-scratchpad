@@ -31,7 +31,7 @@ public class Main {
 	        cfg.setLogTemplateExceptions(false);
 	        final FreeMarkerEngine dbEngine = new FreeMarkerEngine(cfg);
 	        Gson gson = new Gson();
-			LessonsUtil.createTable();
+			SnippetsUtil.createTable();
 	        
 			port(Integer.valueOf(System.getenv("PORT")));
 			staticFileLocation("/public");
@@ -73,15 +73,15 @@ public class Main {
 				}
 			});
 			
-			get("/lessons/get", (req, res) -> {
+			get("/snippets/get", (req, res) -> {
 				res.type("application/json");
 				try (Connection connection = dataSource.getConnection()) {
 					Statement stmt = connection.createStatement();
-					ResultSet rs = stmt.executeQuery("SELECT * FROM lessons;");
+					ResultSet rs = stmt.executeQuery("SELECT * FROM snippets;");
 					
-					ArrayList<Lesson> output = new ArrayList<Lesson>();
+					ArrayList<Snippet> output = new ArrayList<Snippet>();
 					while (rs.next()) {
-						Lesson l = new Lesson();
+						Snippet l = new Snippet();
 						l.setId(String.format("%03d", Integer.parseInt(rs.getString("id"))));
 						l.setTitle(rs.getString("title"));
 						l.setSnippet(rs.getString("snippet"));
@@ -94,16 +94,16 @@ public class Main {
 			}, gson::toJson);
 			
 
-			get("/lessons/get/:lessonId", (req, res) -> {
-				System.out.println(req.params(":lessonId"));
+			get("/snippets/get/:snippetId", (req, res) -> {
+				System.out.println(req.params(":snippetId"));
 				res.type("application/json");
 				try (Connection connection = dataSource.getConnection()) {
-					PreparedStatement stmt = connection.prepareStatement("SELECT * FROM lessons WHERE id = ?;");
-					stmt.setInt(1, Integer.parseInt(req.params(":lessonId")));
+					PreparedStatement stmt = connection.prepareStatement("SELECT * FROM snippets WHERE id = ?;");
+					stmt.setInt(1, Integer.parseInt(req.params(":snippetId")));
 					ResultSet rs = stmt.executeQuery();
 
 					if (rs.next()) {
-						Lesson l = new Lesson();
+						Snippet l = new Snippet();
 						l.setId(rs.getString("id"));
 						l.setTitle(rs.getString("title"));
 						l.setSnippet(rs.getString("snippet"));
