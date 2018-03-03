@@ -82,7 +82,7 @@ public class Main {
 					ArrayList<Lesson> output = new ArrayList<Lesson>();
 					while (rs.next()) {
 						Lesson l = new Lesson();
-						l.setId(rs.getString("id"));
+						l.setId(String.format("%03d", Integer.parseInt(rs.getString("id"))));
 						l.setTitle(rs.getString("title"));
 						l.setSnippet(rs.getString("snippet"));
 						output.add(l);

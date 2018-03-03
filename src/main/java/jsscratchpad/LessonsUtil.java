@@ -33,8 +33,13 @@ public class LessonsUtil {
 					+ "snippet VARCHAR(5000) NOT NULL);");
 			try {
 				String[] lessonFileNames = {
+					"001_console.js",
+					"002_variables.js",
+					"003_strings.js",
 					"100_variables.js",
 					"101_adding_strings.js",
+					"500_p5_2D_template.js",
+					"600_p5_3D_template.js"
 				};
 				for (String filename : lessonFileNames) {
 					int separatorIndex = filename.indexOf('_');

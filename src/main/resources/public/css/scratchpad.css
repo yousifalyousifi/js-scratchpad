@@ -39,6 +39,7 @@ body {
     right: 0px;
 }
 #displayContainer pre {
+    font-size: inherit;
     color: lightgrey;
     border-style: none;
     background-color: rgb(39,40,34);

@@ -1,6 +1,7 @@
 $(document).ready(function() {
     
     var that = this;
+    var currentFontSize = 14;
     var mode = undefined;
 
     var codeRunner = new CodeRunner("#displayContainer pre");
@@ -34,26 +35,31 @@ $(document).ready(function() {
         readOnly: false // false if this command should not apply in readOnly mode
     });
 
+    setFontSize(currentFontSize);
     getLessons();
+
+    function setFontSize(size) {
+        editor.setFontSize(size);
+        $("#displayContainer").css("font-size", size+"px");
+    }
 
     $("#runButton").click(function() {
         that.runThis(editor.getValue());
     });
 
     $("#font14px").click(function() {
-        editor.setFontSize(14);
-        $("#displayContainer span").css("font-size", "14px");
-
+    	currentFontSize = 14;
+        setFontSize(currentFontSize);
     });
 
     $("#font18px").click(function() {
-        editor.setFontSize(18);
-        $("#displayContainer span").css("font-size", "18px");
+    	currentFontSize = 18;
+        setFontSize(currentFontSize);
     });
 
     $("#font24px").click(function() {
-        editor.setFontSize(24);
-        $("#displayContainer span").css("font-size", "24px");
+    	currentFontSize = 24;
+        setFontSize(currentFontSize);
     });
 
     var wordWrap = false;
@@ -65,6 +71,11 @@ $(document).ready(function() {
         } else {
         	$("#wordWrap").text("Enable Word Wrap");
         }
+    });
+
+    $("#clearButton").click(function() {
+    	mode = undefined;
+    	consoleMode();
     });
 
     $("#consoleMode").click(function() {
@@ -84,7 +95,7 @@ $(document).ready(function() {
 		'<span>Console Output</span>'+
 		'<hr style="margin:0;" class="codeRunSeparator"/>'+
 		'</pre>';
-
+		$("#clearButton").show();
     	$("#displayContainer").html(consoleHTML);
     }
     function drawMode() {
@@ -96,6 +107,7 @@ $(document).ready(function() {
 		'<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>' +
 		'<div id="p5Container"/>'+
 		'</pre>';
+		$("#clearButton").hide();
     	$("#displayContainer").html(drawHTML);
     	mode = "draw";
     	runner = drawRunner;

@@ -15,7 +15,7 @@ function CodeRunner(jQSelector) { //The selector should point to a <pre>
 	var fakeConsoleErrorFunction;
 
 	function replaceConsole() {
-		console.log("Replacing console.");
+		console.log("Replacing console");
 		if (typeof console  != "undefined") {
 		    if (typeof console.log != 'undefined') {
 		        console.olog = console.log;
@@ -26,7 +26,7 @@ function CodeRunner(jQSelector) { //The selector should point to a <pre>
 		    }     
 		}
 		console.log = function(message) {
-		    console.olog(arguments);
+		    console.olog(message);
 		    newlog(arguments);
 		};
 		console.error = function(message) {
