@@ -7,3 +7,4 @@ src/main/resources/public/bootstrap-3.3.7-dist/*
 src/main/resources/public/ace-builds-master
 ace-builds-master
 bootstrap-3.3.7-dist
+.vscode/
