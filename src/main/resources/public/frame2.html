@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    </head>
+    <body>
+
+        <div id="displayContainer">
+        </div>
+        <script src="js/jquery/jquery3.2.1.js"></script>
+        <script src="js/jquery/jquery.ba-throttle-debounce.min.js"></script>
+        <script src="js/p5/p5.js"></script>
+        <script src="js/p5/addons/p5.sound.js"></script>
+        <script src="js/p5/addons/p5.dom.js"></script>
+        
+        <script>
+            var rand1;
+            function setup() {
+                createCanvas(200,200);
+                rand1 = random(255);
+            }
+
+
+            function draw() {
+                background(182, 208, 249);
+                let spacing = 30;
+                let value = abs(sin(frameCount/50));
+                let h = (height-spacing*2)*(value);
+                fill((frameCount/200)%255,mouseX%255,rand1);
+                rect(spacing, spacing+(h), width-spacing*2, height-2*spacing-h);
+                fill(mouseY%255,(frameCount/100)%150,rand1);
+                ellipse(mouseX, mouseY, 20,20);
+            }
+            new p5(undefined, "displayContainer");
+        </script>
+
+    </body>
+</html>
