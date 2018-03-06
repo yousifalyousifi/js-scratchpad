@@ -87,28 +87,16 @@ $(document).ready(function() {
     });
 
     function consoleMode() {
-    	if(mode == "console") {return;}
-    	mode = "console";
-    	runner = codeRunner;
-		var consoleHTML = 
-		'<pre>'+
-		'<span>Console Output</span>'+
-		'<hr style="margin:0;" class="codeRunSeparator"/>'+
-		'</pre>';
-		$("#clearButton").show();
-    	$("#displayContainer").html(consoleHTML);
+        if(mode == "console") {return;}
+        drawRunner.exitMode();
+        codeRunner.enterMode();
+        mode = "console";
+        runner = codeRunner;
     }
     function drawMode() {
     	if(mode == "draw") {return;}
-    	$("#p5Container").html("");
-    	var drawHTML = 
-		'<pre>'+
-		'<span>Canvas</span>' +
-		'<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>' +
-		'<div id="p5Container"/>'+
-		'</pre>';
-		$("#clearButton").hide();
-    	$("#displayContainer").html(drawHTML);
+        codeRunner.exitMode();
+        drawRunner.enterMode();
     	mode = "draw";
     	runner = drawRunner;
     }

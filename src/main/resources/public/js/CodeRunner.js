@@ -71,6 +71,21 @@ function CodeRunner(jQSelector) { //The selector should point to a <pre>
 		appender(line);
 		appender(document.createElement("br"));
 	};
+	
+    this.enterMode = function() {
+		var consoleHTML = 
+		'<pre>'+
+		'<span>Console Output</span>'+
+		'<hr style="margin:0;" class="codeRunSeparator"/>'+
+		'</pre>';
+		$("#clearButton").show();
+    	$("#displayContainer").html(consoleHTML);
+    };
+
+    this.exitMode = function() {
+		$("#clearButton").hide();
+    	$("#displayContainer").html("");
+    };
 
 	this.runThis = function(code) {
 		try {
