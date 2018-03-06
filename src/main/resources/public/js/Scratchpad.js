@@ -74,8 +74,19 @@ $(document).ready(function() {
     });
 
     $("#clearButton").click(function() {
-    	mode = undefined;
-    	consoleMode();
+        mode = undefined;
+        consoleMode();
+    });
+    
+    $("#p5RefButton").click(function() {
+        let p5RefUrl = "https://p5js.org/reference/";
+        let p5RefSearchUrl = p5RefUrl + "#/p5/";
+        let selectedText = editor.getSelectedText();
+        if(selectedText) {
+            window.open(p5RefSearchUrl+selectedText, "_blank").focus();
+        } else {
+            window.open(p5RefUrl, "_blank").focus();
+        }
     });
 
     $("#consoleMode").click(function() {

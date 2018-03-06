@@ -11,11 +11,12 @@ function DrawRunner(divId) {
 		'<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>' +
 		'<div id="' + divId + number + '"/>'+
 		'</pre>';
+        $("#p5RefButton").show();
     	$("#displayContainer").html(drawHTML);
     };
 
     this.exitMode = function() {
-
+        $("#p5RefButton").hide();
     };
 
 	this.runThis = function(code) {
