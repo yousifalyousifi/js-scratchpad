@@ -1,18 +1,12 @@
 function CodeRunner(jQSelector) { //The selector should point to a <pre>
 
-	var me = this;
+	var that = this;
 	
 	this.jQSelector = jQSelector;
 
 	function appender(line) {
-		$(me.jQSelector).append(line);
+		$(that.jQSelector).append(line);
 	};
-
-	var rateLimitedAppender = appender;//RateLimit(appender, 50);
-	var realConsoleLogFunction;
-	var realConsoleErrorFunction;
-	var fakeConsoleLogFunction;
-	var fakeConsoleErrorFunction;
 
 	function replaceConsole() {
 		console.log("Replacing console");
@@ -103,13 +97,13 @@ function CodeRunner(jQSelector) { //The selector should point to a <pre>
 	function insertCodeOutputSeparator() {
 		var line = $(document.createElement("hr"));
 		line.addClass("codeRunSeparator");
-		$(me.jQSelector).append(line);
+		$(that.jQSelector).append(line);
 	}
 
 	function scrollToBottom() {
-		// var d = $(me.jQSelector);
+		// var d = $(that.jQSelector);
 		// d.scrollTop(d.prop("scrollHeight"));
-		$(me.jQSelector).animate({ scrollTop: $(me.jQSelector).prop("scrollHeight")}, 500);
+		$(that.jQSelector).animate({ scrollTop: $(that.jQSelector).prop("scrollHeight")}, 500);
 	};
 
 	function getHTMLForOutput(value, withQuotesIfString) {
