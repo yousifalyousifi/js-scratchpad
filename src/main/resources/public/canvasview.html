@@ -4,33 +4,108 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     </head>
+    <style>
+    body {
+        background-color: rgb(39,40,34);
+    }
+    iframe {
+      border: 2px solid grey;
+    }
+    </style>
     <body>
-            <iframe src="frame2.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame1.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame2.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame1.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame2.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame1.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame2.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame1.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
-            <iframe src="frame2.html" width="225" height="225">
-              <p>Your browser does not support iframes.</p>
-            </iframe>
+      <iframe id="frame1" src="frame1.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame2" src="frame2.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame3" src="frame1.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame4" src="frame2.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame5" src="frame1.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame6" src="frame2.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame7" src="frame1.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame8" src="frame2.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <iframe id="frame9" src="frame1.html" width="225" height="225">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+      <script>
+        setTimeout(function() {
+            var iframe1 = document.getElementById('frame1');
+            var innerDoc1 = iframe1.contentDocument || iframe1.contentWindow.document;
+            var canvas1width = innerDoc1.getElementsByTagName("canvas")[0].width;
+            var canvas1height = innerDoc1.getElementsByTagName("canvas")[0].height;
+            iframe1.setAttribute("width", canvas1width+30);
+            iframe1.setAttribute("height", canvas1height+30);
+            
+            var iframe2 = document.getElementById('frame2');
+            var innerDoc2 = iframe2.contentDocument || iframe2.contentWindow.document;
+            var canvas2width = innerDoc2.getElementsByTagName("canvas")[0].width;
+            var canvas2height = innerDoc2.getElementsByTagName("canvas")[0].height;
+            iframe2.setAttribute("width", canvas2width+30);
+            iframe2.setAttribute("height", canvas2height+30);
+            
+            var iframe3 = document.getElementById('frame3');
+            var innerDoc3 = iframe3.contentDocument || iframe3.contentWindow.document;
+            var canvas3width = innerDoc3.getElementsByTagName("canvas")[0].width;
+            var canvas3height = innerDoc3.getElementsByTagName("canvas")[0].height;
+            iframe3.setAttribute("width", canvas3width+30);
+            iframe3.setAttribute("height", canvas3height+30);
+            
+            var iframe4 = document.getElementById('frame4');
+            var innerDoc4 = iframe4.contentDocument || iframe4.contentWindow.document;
+            var canvas4width = innerDoc4.getElementsByTagName("canvas")[0].width;
+            var canvas4height = innerDoc4.getElementsByTagName("canvas")[0].height;
+            iframe4.setAttribute("width", canvas4width+30);
+            iframe4.setAttribute("height", canvas4height+30);
+            
+            var iframe5 = document.getElementById('frame5');
+            var innerDoc5 = iframe5.contentDocument || iframe5.contentWindow.document;
+            var canvas5width = innerDoc5.getElementsByTagName("canvas")[0].width;
+            var canvas5height = innerDoc5.getElementsByTagName("canvas")[0].height;
+            iframe5.setAttribute("width", canvas5width+30);
+            iframe5.setAttribute("height", canvas5height+30);
+            
+            var iframe6 = document.getElementById('frame6');
+            var innerDoc6 = iframe6.contentDocument || iframe6.contentWindow.document;
+            var canvas6width = innerDoc6.getElementsByTagName("canvas")[0].width;
+            var canvas6height = innerDoc6.getElementsByTagName("canvas")[0].height;
+            iframe6.setAttribute("width", canvas6width+30);
+            iframe6.setAttribute("height", canvas6height+30);
+            
+            var iframe7 = document.getElementById('frame7');
+            var innerDoc7 = iframe7.contentDocument || iframe7.contentWindow.document;
+            var canvas7width = innerDoc7.getElementsByTagName("canvas")[0].width;
+            var canvas7height = innerDoc7.getElementsByTagName("canvas")[0].height;
+            iframe7.setAttribute("width", canvas7width+30);
+            iframe7.setAttribute("height", canvas7height+30);
+            
+            var iframe8 = document.getElementById('frame8');
+            var innerDoc8 = iframe8.contentDocument || iframe8.contentWindow.document;
+            var canvas8width = innerDoc8.getElementsByTagName("canvas")[0].width;
+            var canvas8height = innerDoc8.getElementsByTagName("canvas")[0].height;
+            iframe8.setAttribute("width", canvas8width+30);
+            iframe8.setAttribute("height", canvas8height+30);
+            
+            var iframe9 = document.getElementById('frame9');
+            var innerDoc9 = iframe9.contentDocument || iframe9.contentWindow.document;
+            var canvas9width = innerDoc9.getElementsByTagName("canvas")[0].width;
+            var canvas9height = innerDoc9.getElementsByTagName("canvas")[0].height;
+            iframe9.setAttribute("width", canvas9width+30);
+            iframe9.setAttribute("height", canvas9height+30);
+            
+        }, 5000);
+    </script>
     </body>
 </html>
