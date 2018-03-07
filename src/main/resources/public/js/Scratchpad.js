@@ -8,7 +8,7 @@ $(document).ready(function() {
     var drawRunner = new DrawRunner("p5Container");
     var runner = codeRunner; 
 
-    consoleMode();
+    //consoleMode();
 
     var editor = ace.edit("editor");
 
@@ -43,8 +43,52 @@ $(document).ready(function() {
         $("#displayContainer").css("font-size", size+"px");
     }
 
+
+
+    var consoleElement = $(document.createElement("div"))
+    .attr("id", "consoleElement")
+    .html( 
+        '<pre id="newconsole">'+
+        '<span>Console Output</span>'+
+        '<hr style="margin:0;" class="codeRunSeparator"/>'+
+        '</pre>');
+
+    var canvasElement = $(document.createElement("div"))
+    .attr("id", "canvasElement")
+    .html( 
+        '<pre id="newcanvas">'+
+        '<span>Canvas</span>' +
+        '<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>' +
+        '<div id="p5Container"/>'+
+        '</pre>');
+
+    var util = new ConsoleUtil("consoleElement");
+
     $("#runButton").click(function() {
-        that.runThis(editor.getValue());
+
+        if(mode == "console") {
+            util.runThis(function() {
+                $.globalEval(editor.getValue());
+            }, true);
+        }
+
+        if(mode == "draw") {
+            if(window.pInstance) {
+                pInstance.remove();
+                console.log("Removed old p5 instance");
+            }
+            $("#displayContainer").html("");
+            $("#displayContainer").append(canvasElement);
+            $("#displayContainer").append(consoleElement);
+            util.runThis(function() {
+                $.globalEval(editor.getValue()+';$("#p5Container").html("");window.pInstance = new p5(undefined, "p5Container");');
+            }, false);
+
+
+        
+    
+        }
+        //that.runThis(editor.getValue());
     });
 
     $("#font14px").click(function() {
