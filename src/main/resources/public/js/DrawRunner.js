@@ -1,14 +1,12 @@
 function DrawRunner(divId) {
 
-    var number = 0;
-
     this.enterMode = function() {
     	$("#p5Container").html("");
     	var drawHTML = 
 		'<pre>'+
 		'<span>Canvas</span>' +
 		'<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>' +
-		'<div id="' + divId + number + '"/>'+
+		'<div id="' + divId + '"/>'+
 		'</pre>';
         $("#p5RefButton").show();
     	$("#displayContainer").html(drawHTML);
