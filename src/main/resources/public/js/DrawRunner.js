@@ -3,7 +3,6 @@ function DrawRunner(divId) {
     var number = 0;
 
     this.enterMode = function() {
-        number++;
     	$("#p5Container").html("");
     	var drawHTML = 
 		'<pre>'+
@@ -24,7 +23,7 @@ function DrawRunner(divId) {
             pInstance.remove();
             console.log("Removed old p5 instance");
         }
-        $.globalEval(code+';$("#' + divId + '").html("");window.pInstance = new p5(undefined, "' + divId + number + '");');
+        $.globalEval(code+';$("#' + divId + '").html("");window.pInstance = new p5(undefined, "' + divId + '");');
 	};
 
 }

@@ -80,10 +80,10 @@
         }
         function intervalFunc() {
             let iframe1 = $("#"+divId + " iframe")[0];
-            if(iframe1) {
+            if(iframe1) { // this guard is needed because sometimes this function is called too soon, and the browser hadn't had enough time to create the iframe.
                 let innerDoc1 = iframe1.contentDocument || iframe1.contentWindow.document;
                 let canvas1 = innerDoc1.getElementsByTagName("canvas")[0];
-                if(canvas1) {
+                if(canvas1) { //this guard is needed for the same reason as above. The browser my not have created the canvas yet.
                   let canvas1width = canvas1.style.width.substr(0,canvas1.style.width.length-2);
                   let canvas1height = canvas1.style.height.substr(0,canvas1.style.height.length-2);
                   //https://stackoverflow.com/a/1373879
