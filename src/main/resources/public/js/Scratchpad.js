@@ -43,8 +43,11 @@ $(document).ready(function() {
         $("#displayContainer").css("font-size", size+"px");
     }
 
+    var someUniqueId = "ID" + (new Date().getTime());
     $("#runButton").click(function() {
         that.runThis(editor.getValue());
+        sendSketch(someUniqueId, editor.getValue());
+        console.log("Sent code from ID: " + someUniqueId);
     });
 
     $("#font14px").click(function() {
@@ -169,11 +172,22 @@ $(document).ready(function() {
 	    });
 	}
 
-    function wsUrl(path) {
-	    let l = window.location;
-	    let protocol = ((l.protocol === "https:") ? "wss://" : "ws://");
-	    let hostname = l.hostname;
-	    let port = ((l.port != 80) && (l.port != 443)) ? ":" + l.port : "";
-	    return protocol + hostname + port + path;
+    function sendSketch(myId, sketchCode) {
+        $.ajax({
+          method: "POST",
+          url: "/sketch/send",
+          data: {
+            id: myId,
+            code: sketchCode
+          }
+        })
+        .done(function( msg ) {
+
+        })
+        .fail(function( msg ) {
+          console.error("Failed to get snippets...");
+          console.error( msg );
+        });
     }
+
 });

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <script src="js/jquery/jquery3.2.1.js"></script>
+    </head>
+    <style>
+    body {
+        background-color: rgb(39,40,34);
+    }
+    body div {
+        float: left;
+        margin: 5px;
+    }
+    iframe {
+        border: 2px solid grey;
+        padding: 10px;
+    }
+    </style>
+    <body>
+    </body>
+    <script>
+      var maxWidth = 400;
+      var maxHeight = 400;
+      var refreshIntervalHandles = {};
+
+      function insertOrReplaceSketchInDiv(divId) {
+          clearDiv(divId);
+          $("#"+divId).append(createIFrame(divId));
+      }
+
+      function appendDiv(divId) {
+          var d = document.createElement("div");
+          $(d).attr("id", divId);
+          $("body").append(d);
+      }
+
+      function createIFrame(divId) {
+          var iframeEl = document.createElement("iframe");
+          $(iframeEl).attr("src","/sketch/get/"+divId);
+          return iframeEl;
+      }
+
+      function clearDiv(divId) {
+          $("#"+divId).html("");
+      }
+
+      function divExists(divId) {
+          return $("#"+divId).length > 0;
+      }
+
+      function wsUrl(path) {
+         let l = window.location;
+         let protocol = ((l.protocol === "https:") ? "wss://" : "ws://");
+         let hostname = l.hostname;
+         let port = ((l.port != 80) && (l.port != 443)) ? ":" + l.port : "";
+         return protocol + hostname + port + path;
+      }
+
+      var socket = new WebSocket(wsUrl("/sketch/connect"));
+      socket.onmessage = function(msg) {
+          console.log(msg.data);
+          var idList = JSON.parse(msg.data);
+          for(var id of idList) {
+            console.log(id);
+            if(!divExists(id)) {
+              appendDiv(id);
+              insertOrReplaceSketchInDiv(id);
+            } else {
+              insertOrReplaceSketchInDiv(id);
+            }
+            createOrReplaceRefreshInterval(id);
+          }
+      };
+
+      function createOrReplaceRefreshInterval(divId) {
+        if(refreshIntervalHandles[divId]) {
+            clearInterval(refreshIntervalHandles[divId]);
+        }
+        function intervalFunc() {
+            let iframe1 = $("#"+divId + " iframe")[0];
+            if(iframe1) {
+                let innerDoc1 = iframe1.contentDocument || iframe1.contentWindow.document;
+                let canvas1 = innerDoc1.getElementsByTagName("canvas")[0];
+                if(canvas1) {
+                  let canvas1width = canvas1.style.width.substr(0,canvas1.style.width.length-2);
+                  let canvas1height = canvas1.style.height.substr(0,canvas1.style.height.length-2);
+                  //https://stackoverflow.com/a/1373879
+                  let scale = Math.min(maxWidth/canvas1width, maxHeight/canvas1height);
+                  canvas1newWidth = canvas1width*scale;
+                  canvas1newHeight = canvas1height*scale;
+                  let spacing = (window.spacing||30);
+                  canvas1.style.width = canvas1newWidth + "px";
+                  canvas1.style.height = canvas1newHeight + "px";
+                  console.log(canvas1newWidth, canvas1newHeight, canvas1width, canvas1height);
+                  iframe1.setAttribute("width", canvas1newWidth+spacing);
+                  iframe1.setAttribute("height", canvas1newHeight+spacing);
+                  clearInterval(refreshIntervalHandles[divId]);
+                  let handle = setInterval(intervalFunc, 2000);
+                  refreshIntervalHandles[divId] = handle;
+                }
+            }
+        }
+        let handle = setInterval(intervalFunc, 100); //we start a fast refresher, then slow it down once the canvas elements loads
+        refreshIntervalHandles[divId] = handle;
+      }
+
+    </script>
+</html>

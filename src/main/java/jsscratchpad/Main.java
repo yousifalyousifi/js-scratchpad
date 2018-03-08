@@ -1,6 +1,7 @@
 package jsscratchpad;
 import static spark.Spark.get;
 import static spark.Spark.port;
+import static spark.Spark.post;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.stop;
 
@@ -9,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -18,6 +20,7 @@ import com.google.gson.Gson;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import spark.ModelAndView;
+import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 
 public class Main {
@@ -35,6 +38,9 @@ public class Main {
 	        
 			port(Integer.valueOf(System.getenv("PORT")));
 			staticFileLocation("/public");
+			
+			final CanvasViewer viewer = new CanvasViewer();
+			Spark.webSocket("/sketch/connect", viewer);
 			
 			get("/", (request, response) -> {
 				response.redirect("editor.html"); 
@@ -93,7 +99,6 @@ public class Main {
 				}
 			}, gson::toJson);
 			
-
 			get("/snippets/get/:snippetId", (req, res) -> {
 				System.out.println(req.params(":snippetId"));
 				res.type("application/json");
@@ -117,6 +122,21 @@ public class Main {
 				}
 			}, gson::toJson);
 			
+			
+			post("/sketch/send", (req, res) -> {
+				String id = req.queryParams("id");
+				String code = req.queryParams("code");
+				viewer.putCode(id, code);
+				res.status(200);
+				return "";
+			});
+
+			get("/sketch/get/:id", (req, res) -> {
+				String id = req.params(":id");
+				Map<String,String> test = new HashMap<String, String>();
+				test.put("code",viewer.getCode(id));
+				return new FreeMarkerEngine().render(new ModelAndView(test, "/canvasiframe.ftl"));
+			});
 			
 
 		} catch (Throwable e) {
