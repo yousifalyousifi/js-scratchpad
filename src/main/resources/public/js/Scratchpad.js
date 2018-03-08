@@ -43,11 +43,8 @@ $(document).ready(function() {
         $("#displayContainer").css("font-size", size+"px");
     }
 
-    var someUniqueId = "ID" + (new Date().getTime());
     $("#runButton").click(function() {
         that.runThis(editor.getValue());
-        sendSketch(someUniqueId, editor.getValue());
-        console.log("Sent code from ID: " + someUniqueId);
     });
 
     $("#font14px").click(function() {
@@ -115,8 +112,13 @@ $(document).ready(function() {
     	runner = drawRunner;
     }
 
+    var someUniqueId = "ID" + (new Date().getTime());
     this.runThis = function(code) {
     	runner.runThis(code);
+        if(mode == "draw") {
+            sendSketch(someUniqueId, code);
+            console.log("Sent code from ID: " + someUniqueId);
+        }
     };
 
     function getSnippet(snippetIndex) {
