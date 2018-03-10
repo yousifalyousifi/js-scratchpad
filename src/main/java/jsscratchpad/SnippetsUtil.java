@@ -62,20 +62,6 @@ public class SnippetsUtil {
 		}
 	}
 
-	public static void main(String[] args) {
-			
-//			for (String filename : getResourceFiles(path)) {
-//				int separatorIndex = filename.indexOf('_');
-//				String title = filename.substring(separatorIndex+1, filename.length()-3);
-//				System.out.println(title);
-//				String[] parts = filename.split("_");
-//				String id = parts[0];
-//				System.out.println(id);
-//				System.out.println(getResourceFile(path + filename));
-//			}
-//			LessonsUtil.createTable();
-	}
-
 	private static String getResourceFile(String path) throws IOException {
 
 		try (InputStream in = getResourceAsStream(path)) {

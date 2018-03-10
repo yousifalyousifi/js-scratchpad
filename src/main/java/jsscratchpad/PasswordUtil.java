@@ -13,21 +13,5 @@ public class PasswordUtil {
 	public static boolean check(String password, String hashed) {
 		return SCryptUtil.check(password, hashed);
 	}
-	
-	public static void main(String[] args) {
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-		System.out.println(hashPassword(UUID.randomUUID().toString()));
-	}
 
 }
