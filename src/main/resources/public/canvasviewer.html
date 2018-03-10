@@ -179,7 +179,7 @@
           };
           let keepAliveIntervalHandle = setInterval(function() {
             socket.send(JSON.stringify({type:"KEEP_ALIVE"}));
-          }, 60000);
+          }, 20000);
           return socket;
       }
 
