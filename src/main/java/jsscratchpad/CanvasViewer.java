@@ -23,10 +23,15 @@ public class CanvasViewer {
 
     private static final Queue<Session> viewers = new ConcurrentLinkedQueue<>();
     private static final Map<String, String> sketches = new ConcurrentHashMap<>();
+    private static final Map<String, Long> lastUpdated = new ConcurrentHashMap<>();
+
+    public static final String KEEP_ALIVE = "KEEP_ALIVE";
+    public static final String DELETE_ALL = "DELETE_ALL";
+    private static class Message {String type; String data;}
 
     @OnWebSocketConnect
     public void connected(Session session) {
-        System.out.println("connected");
+        System.out.println("Viewer opened socket.");
         viewers.add(session);
 
     	Gson gson = new GsonBuilder().create();
@@ -39,18 +44,25 @@ public class CanvasViewer {
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
-        System.out.println("closed");
+        System.out.println("Viewer closed socket.");
         viewers.remove(session);
     }
 
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
-        System.out.println("Got: " + message);
-        session.getRemote().sendString(message);
+    	Gson gson = new GsonBuilder().create();
+    	Message m = gson.fromJson(message, Message.class);
+    	if(m.type.equals(KEEP_ALIVE)) {
+    		//do nothing
+    	} else if(m.type.equals(DELETE_ALL)) {
+    		sketches.clear();
+    		lastUpdated.clear();
+    	}
     }
 
     public void putCode(String id, String code) {
     	sketches.put(id, code);
+    	lastUpdated.put(id, System.currentTimeMillis());
     	Iterator<Session> iter = viewers.iterator();
     	Gson gson = new GsonBuilder().create();
     	

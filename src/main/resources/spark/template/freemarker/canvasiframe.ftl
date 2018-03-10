@@ -24,7 +24,7 @@
         
         <script>
             ${code}
-            new p5(undefined, "displayContainer");
+            document.p5Instance = new p5(undefined, "displayContainer");
         </script>
 
     </body>

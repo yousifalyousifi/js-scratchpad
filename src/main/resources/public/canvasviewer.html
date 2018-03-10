@@ -3,37 +3,137 @@
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link href="css/bootstrap.4.0.0.min.cyborg.css" rel="stylesheet">
+        <link href="css/scratchpad.css" rel="stylesheet" media="screen">
         <script src="js/jquery/jquery3.2.1.js"></script>
+        <script src="js/bootstrap/bootstrap.4.0.0.min.js"></script>
     </head>
     <style>
     body {
         background-color: rgb(39,40,34);
     }
-    body div {
+    iframe {
+        border: 1px solid grey;
+        padding: 10px;
+    }
+    nav {
+      height: 25px;
+    }
+    .canvasView {
+        border: 2px solid grey;
         float: left;
         margin: 5px;
     }
-    iframe {
-        border: 2px solid grey;
-        padding: 10px;
+    .sketchLabel {
+      font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: white;
+      font-size: 1.09375rem;
     }
     </style>
     <body>
+
+      <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Viewer</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li id="runButton" title="Ctrl+R" class="nav-item">
+                        <a class="nav-link" href="#" data-toggle="modal" data-target="#myModal">Settings</a>
+                    </li>
+                    <!-- <li id="clearButton" class="nav-item">
+                        <a class="nav-link" href="#">Clear</a>
+                    </li> -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="actionsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Actions
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="actionsDropdown">
+                            <a id="deleteAll" class="dropdown-item" href="#">Delete All</a>
+                        </div>
+                    </li>
+                    <li id="editorButton" class="nav-item">
+                        <a class="nav-link" href="/editor.html" target="_blank">Open Editor</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="modal fade" id="myModal" role="dialog" aria-labelledby="settingsModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"> 
+                        <h4 class="modal-title" id="settingsModalTitle">Settings</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="max-height: 300px; overflow: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                  <td>Maximum Width</td>
+                                  <td><input id="maxWidthInput" type="number" name="maxWidth" value="500"/></td>
+                                </tr>
+                                <tr>
+                                  <td>Maximum Height</td>
+                                  <td><input id="maxHeightInput" type="number" name="maxHeight" value="500"/></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      <div style="display: none;" id="template">
+        <div class="canvasView" id="">
+          <br/>
+          <div class="canvasViewButtons">
+            <span class="sketchLabel"></span>
+            <!-- <button type="button" class="btn btn-dark btn-sm">Close</button> -->
+          </div>
+        </div>
+      </div>
     </body>
     <script>
-      var maxWidth = 400;
-      var maxHeight = 400;
       var refreshIntervalHandles = {};
+      var originalSizes = {};
 
-      function insertOrReplaceSketchInDiv(divId) {
-          clearDiv(divId);
-          $("#"+divId).append(createIFrame(divId));
+      var socket = setUpCanvasViewerSocket();
+
+      $("#deleteAll").click(function() {
+        sendDeleteAllMessage();
+        clearAllRefreshIntervals();
+        deleteAllP5Instances();
+        originalSizes = {};
+        $(".activeCanvasView").remove();//maybe we should also explicitly destroy the p5 instances?
+      });
+
+      function getDivTemplate() {
+        return $("#template").html();
+      }
+
+      function divExists(divId) {
+          return $("#"+divId).length > 0;
       }
 
       function appendDiv(divId) {
-          var d = document.createElement("div");
-          $(d).attr("id", divId);
+          var d = $(getDivTemplate()); //document.createElement("div");
+          $(d).attr("id", divId).addClass("activeCanvasView");
+          $(d).find("span.sketchLabel").text(divId);
           $("body").append(d);
+      }
+
+      function clearIframeFromDiv(divId) {
+          $("#"+divId).children("iframe").remove();
       }
 
       function createIFrame(divId) {
@@ -42,12 +142,9 @@
           return iframeEl;
       }
 
-      function clearDiv(divId) {
-          $("#"+divId).html("");
-      }
-
-      function divExists(divId) {
-          return $("#"+divId).length > 0;
+      function insertOrReplaceIframeInDiv(divId) {
+          clearIframeFromDiv(divId);
+          $("#"+divId).prepend(createIFrame(divId));
       }
 
       function wsUrl(path) {
@@ -58,44 +155,80 @@
          return protocol + hostname + port + path;
       }
 
-      var socket = new WebSocket(wsUrl("/sketch/connect"));
-      socket.onmessage = function(msg) {
-          console.log(msg.data);
-          var idList = JSON.parse(msg.data);
-          for(var id of idList) {
-            console.log(id);
-            if(!divExists(id)) {
-              appendDiv(id);
-              insertOrReplaceSketchInDiv(id);
-            } else {
-              insertOrReplaceSketchInDiv(id);
-            }
-            createOrReplaceRefreshInterval(id);
+      function setUpCanvasViewerSocket() {
+          let socket = new WebSocket(wsUrl("/sketch/connect"));
+          socket.onopen = function(msg) {
+            console.log("Socket Opened. " + (new Date().getTime()+""));
           }
-      };
+          socket.onclose = function(msg) {
+            console.log("Socket Closed. " + (new Date().getTime()+""));
+          }
+          socket.onmessage = function(msg) {
+              console.log(msg.data);
+              let idList = JSON.parse(msg.data);
+              for(let id of idList) {
+                if(!divExists(id)) {
+                  // createPopup(id);
+                  appendDiv(id);
+                  insertOrReplaceIframeInDiv(id);
+                } else {
+                  insertOrReplaceIframeInDiv(id);
+                }
+                createOrReplaceRefreshInterval(id);
+              }
+          };
+          let keepAliveIntervalHandle = setInterval(function() {
+            socket.send(JSON.stringify({type:"KEEP_ALIVE"}));
+          }, 60000);
+          return socket;
+      }
+
+      function sendDeleteAllMessage() {
+        socket.send(JSON.stringify({type:"DELETE_ALL"}));
+      }
+
+      function deleteAllP5Instances() {
+        var count = 0;
+        $("iframe").each(function(index, iframeEl) {
+            let innerDoc = iframeEl.contentDocument || iframeEl.contentWindow.document;
+            innerDoc["p5Instance"].remove();
+            count++;
+        });
+        console.log("Removed", count, "p5 instances.");
+      }
 
       function createOrReplaceRefreshInterval(divId) {
         if(refreshIntervalHandles[divId]) {
             clearInterval(refreshIntervalHandles[divId]);
         }
         function intervalFunc() {
-            let iframe1 = $("#"+divId + " iframe")[0];
-            if(iframe1) { // this guard is needed because sometimes this function is called too soon, and the browser hadn't had enough time to create the iframe.
-                let innerDoc1 = iframe1.contentDocument || iframe1.contentWindow.document;
-                let canvas1 = innerDoc1.getElementsByTagName("canvas")[0];
-                if(canvas1) { //this guard is needed for the same reason as above. The browser my not have created the canvas yet.
-                  let canvas1width = canvas1.style.width.substr(0,canvas1.style.width.length-2);
-                  let canvas1height = canvas1.style.height.substr(0,canvas1.style.height.length-2);
+            let iframe = $("#"+divId + " iframe")[0];
+            if(iframe) { // this guard is needed because sometimes this function is called too soon, and the browser hadn't had enough time to create the iframe.
+                let innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                let canvas = innerDoc.getElementsByTagName("canvas")[0];
+                if(canvas) { //this guard is needed for the same reason as above. The browser my not have created the canvas yet.
+                  if(!originalSizes[divId]) {
+                    let canvaswidth = canvas.style.width.substr(0,canvas.style.width.length-2);
+                    let canvasheight = canvas.style.height.substr(0,canvas.style.height.length-2);
+                    originalSizes[divId] = [canvaswidth, canvasheight];
+                  }
+                  let originalWidth = originalSizes[divId][0];
+                  let originalHeight = originalSizes[divId][1];
                   //https://stackoverflow.com/a/1373879
-                  let scale = Math.min(maxWidth/canvas1width, maxHeight/canvas1height);
-                  canvas1newWidth = canvas1width*scale;
-                  canvas1newHeight = canvas1height*scale;
-                  let spacing = (window.spacing||30);
-                  canvas1.style.width = canvas1newWidth + "px";
-                  canvas1.style.height = canvas1newHeight + "px";
-                  console.log(canvas1newWidth, canvas1newHeight, canvas1width, canvas1height);
-                  iframe1.setAttribute("width", canvas1newWidth+spacing);
-                  iframe1.setAttribute("height", canvas1newHeight+spacing);
+                  let maxWidth = $("#maxWidthInput").val();
+                  let maxHeight = $("#maxHeightInput").val();
+                  let scale = 1;
+                  if(originalWidth > maxWidth || originalHeight > maxHeight) {
+                      scale = Math.min(maxWidth/originalWidth, maxHeight/originalHeight);
+                      if(scale <= 0) { scale = 1; }
+                  }
+                  canvasnewWidth = originalWidth*scale;
+                  canvasnewHeight = originalHeight*scale;
+                  let spacing = (window.spacing|40);
+                  canvas.style.width = canvasnewWidth + "px";
+                  canvas.style.height = canvasnewHeight + "px";
+                  iframe.setAttribute("width", canvasnewWidth+spacing);
+                  iframe.setAttribute("height", canvasnewHeight+spacing);
                   clearInterval(refreshIntervalHandles[divId]);
                   let handle = setInterval(intervalFunc, 2000);
                   refreshIntervalHandles[divId] = handle;
@@ -106,5 +239,21 @@
         refreshIntervalHandles[divId] = handle;
       }
 
+      function clearAllRefreshIntervals() {
+        for (var key in refreshIntervalHandles) {
+            if (!refreshIntervalHandles.hasOwnProperty(key)) continue;
+            var handle = refreshIntervalHandles[key];
+            clearInterval(handle);
+        }
+      }
+
+      //might use in the future
+      function createPopup(divId, name)
+      {    
+          name = new Date().getTime()+"";
+          let newwindow=window.open("/sketch/get/"+divId,name,'width=260,height=340,left=300,top=500,toolbar=0,titlebar=0,menubar=0,location=0');  
+          if (newwindow.focus) {newwindow.focus()}
+          return newwindow;
+      }
     </script>
 </html>
