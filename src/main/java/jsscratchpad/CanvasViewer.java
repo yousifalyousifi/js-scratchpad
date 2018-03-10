@@ -55,8 +55,7 @@ public class CanvasViewer {
     	if(m.type.equals(KEEP_ALIVE)) {
     		//do nothing
     	} else if(m.type.equals(DELETE_ALL)) {
-    		sketches.clear();
-    		lastUpdated.clear();
+    		deleteAll();
     	}
     }
 
@@ -83,4 +82,10 @@ public class CanvasViewer {
     	return sketches.get(id);
     }
 
+    public int deleteAll() {
+    	int size = sketches.size();
+		sketches.clear();
+		lastUpdated.clear();
+		return size;
+    }
 }

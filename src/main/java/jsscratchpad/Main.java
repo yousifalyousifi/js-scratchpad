@@ -137,6 +137,10 @@ public class Main {
 				test.put("code",viewer.getCode(id));
 				return new FreeMarkerEngine().render(new ModelAndView(test, "/canvasiframe.ftl"));
 			});
+
+			get("/sketch/deleteall", (req, res) -> {
+				return "Deleted " + viewer.deleteAll();
+			});
 			
 
 		} catch (Throwable e) {
