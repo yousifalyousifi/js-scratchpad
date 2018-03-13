@@ -24,6 +24,11 @@
         
         <script>
             ${code}
+            window.alert = function() {};
+            window.prompt = function() {};
+            //window.console.log = function() {};
+            //window.console.error = function() {};
+            parent = window;
             document.p5Instance = new p5(undefined, "displayContainer");
         </script>
 
