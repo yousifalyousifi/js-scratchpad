@@ -22,6 +22,9 @@
                     <li id="clearButton" class="nav-item">
                         <a class="nav-link" href="#">Clear</a>
                     </li>
+                    <li id="p5RefButton" class="nav-item">
+                        <a class="nav-link" href="#">Reference</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="snippetsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Snippets
@@ -39,7 +42,33 @@
                             <a id="font18px" class="dropdown-item" href="#">18px</a>
                             <a id="font24px" class="dropdown-item" href="#">24px</a>
                             <div class="dropdown-divider"></div>
+                            <div id="ratioButtons" class="btn-group btn-group-toggle" data-toggle="buttons">
+                              <label class="btn btn-sm btn-secondary">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAUCAYAAADskT9PAAAAMUlEQVR42mM4fvz4/4HEDIPGAQx4ADFqSAWjDhh1wKgDRh0w6oBRB4w6YPA5YMS2iAA4TemfUvBlyAAAAABJRU5ErkJggg==" alt="20 80"/>
+                                <input type="radio" name="options" id="option1" checked>
+                              </label>
+                              <label class="btn btn-sm btn-secondary active">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAUCAYAAADskT9PAAAAMElEQVR42mM4fvz4/4HEDIPGAQxkAKroHXXAqANGHTDqgFEHjDpg1AGDxgEjtkUEADu36Z/FDLVCAAAAAElFTkSuQmCC" alt="50 50"/>
+                                <input type="radio" name="options" id="option2">
+                              </label>
+                              <label class="btn btn-sm btn-secondary">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAUCAYAAADskT9PAAAANklEQVR42mM4fvz4/4HEDIPGAQxUBMSYOeqAUQeMOmDUAaMOGHXAqANo7oBjx46R5oAR2yICADum6ZzjSufRAAAAAElFTkSuQmCC" alt="80 20"/>
+                                <input type="radio" name="options" id="option3"> 
+                              </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
                             <a id="wordWrap" class="dropdown-item" href="#">Enable Word Wrap</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Settings
+                        </a>
+                        <div class="dropdown-menu" id="settingsCheckbox" aria-labelledby="settingsDropdown">
+                          <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="autorunCheckbox">
+                            <label class="form-check-label" for="autorunCheckbox">Autorun p5
+                          </div>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -50,9 +79,6 @@
                             <a id="consoleMode" class="dropdown-item" href="#">Console</span></a>
                             <a id="drawMode" class="dropdown-item" href="#">Draw</a>
                         </div>
-                    </li>
-                    <li id="p5RefButton" class="nav-item">
-                        <a class="nav-link" href="#">Reference</a>
                     </li>
                 </ul>
             </div>
@@ -101,6 +127,7 @@ function draw() {
         <div id="displayContainer">
         </div>
         <script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ace/ext-language_tools.js"></script>
         <script src="js/jquery/jquery3.2.1.js"></script>
         <script src="js/jquery/jquery.ba-throttle-debounce.min.js"></script>
         <script src="js/bootstrap/bootstrap.4.0.0.min.js"></script>
@@ -111,6 +138,8 @@ function draw() {
         <script src="js/CodeRunner.js"></script>
         <script src="js/DrawRunner.js"></script>
         <script src="js/Scratchpad.js"></script>
+        <script>
+        </script>
         <div class="modal fade" id="myModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

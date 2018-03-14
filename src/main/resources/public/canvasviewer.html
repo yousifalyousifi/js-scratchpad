@@ -167,6 +167,7 @@
               console.log(msg.data);
               let idList = JSON.parse(msg.data);
               for(let id of idList) {
+                // window.open("/sketch/get/"+id, id, "resizable");
                 if(!divExists(id)) {
                   // createPopup(id);
                   appendDiv(id);

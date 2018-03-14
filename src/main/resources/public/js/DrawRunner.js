@@ -18,10 +18,15 @@ function DrawRunner(divId) {
 
 	this.runThis = function(code) {
         if(window.pInstance) {
-            pInstance.remove();
+            window.pInstance.remove();
             console.log("Removed old p5 instance");
         }
-        $.globalEval(code+';$("#' + divId + '").html("");window.pInstance = new p5(undefined, "' + divId + '");');
+        try {
+            $.globalEval(code+';$("#' + divId + '").html("");window.pInstance = new p5(undefined, "' + divId + '");');
+        } catch (e) {
+            console.error("Error compiling sketch.");
+            console.error(e);
+        }
 	};
 
 }

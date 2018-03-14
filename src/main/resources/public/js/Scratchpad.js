@@ -8,12 +8,18 @@ $(document).ready(function() {
     var drawRunner = new DrawRunner("p5Container");
     var runner = codeRunner; 
 
+    var appProps = {};
+
     consoleMode();
 
     var editor = ace.edit("editor");
 
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/javascript");
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: false
+    });
 
     var storedCode = window.localStorage.getItem("code");
     if (storedCode) {
@@ -26,11 +32,23 @@ $(document).ready(function() {
         console.log("Changes saved.");
         window.localStorage.setItem("code", editor.getValue());
     }));
+    editor.getSession().on('change', function() {
+        if(window.autoRerunSketchHandler && appProps.autorun) {
+            console.log("Delaying redraw.")
+            clearTimeout(window.autoRerunSketchHandler);
+        }
+        window.autoRerunSketchHandler = setTimeout(function() {
+            if(mode == "draw" && appProps.autorun) {
+                console.log("Auto redrawing.")
+                that.runThis(editor.getValue(), false);
+            }
+        }, 1000);
+    });
     editor.commands.addCommand({
         name: 'run',
         bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
         exec: function(editor) {
-            that.runThis(editor.getValue());
+            that.runThis(editor.getValue(), true);
         },
         readOnly: false // false if this command should not apply in readOnly mode
     });
@@ -44,7 +62,7 @@ $(document).ready(function() {
     }
 
     $("#runButton").click(function() {
-        that.runThis(editor.getValue());
+        that.runThis(editor.getValue(), true);
     });
 
     $("#font14px").click(function() {
@@ -89,6 +107,44 @@ $(document).ready(function() {
         }
     });
 
+    //https://stackoverflow.com/a/28603203/1987694
+    $("#ratioButtons :input").change(function() {
+        let ratio = $(this).attr("id");
+        let disp = $("#displayContainer");
+        let edit = $("#editorContainer");
+        if(ratio == "option1") {
+            disp.css("left", "30%");
+            edit.css("right", "71%");
+        } else if(ratio == "option2") {
+            disp.css("left", "50%");
+            edit.css("right", "51%");
+        } else if(ratio == "option3") {
+            disp.css("left", "70%");
+            edit.css("right", "31%");
+        }
+    });
+    
+    //https://stackoverflow.com/a/3442342/1987694
+    $('#settingsCheckbox input:checkbox').change(function() {
+        // this will contain a reference to the checkbox   
+        if (this.checked) {
+            // the checkbox is now checked 
+            appProps.autorun = true;
+        } else {
+            // the checkbox is now no longer checked
+            appProps.autorun = false;
+        }
+    }); 
+
+    //This stops the dropdown from closing on click
+    $('#settingsCheckbox label').click(function(e) {
+        e.stopPropagation();
+    });
+    //This stops the dropdown from closing on click
+    $('#settingsCheckbox').click(function(e) {
+        e.stopPropagation();
+    });
+
     $("#consoleMode").click(function() {
     	consoleMode();
     });
@@ -96,6 +152,9 @@ $(document).ready(function() {
     $("#drawMode").click(function() {
     	drawMode();
     });
+
+
+
 
     function consoleMode() {
         if(mode == "console") {return;}
@@ -113,9 +172,9 @@ $(document).ready(function() {
     }
 
     var someUniqueId = "ID" + (new Date().getTime());
-    this.runThis = function(code) {
+    this.runThis = function(code, send) {
     	runner.runThis(code);
-        if(mode == "draw") {
+        if(mode == "draw" && send) {
             sendSketch(someUniqueId, code);
             console.log("Sent code from ID: " + someUniqueId);
         }
