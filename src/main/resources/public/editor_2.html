@@ -270,7 +270,7 @@ function process(code) {
         let newcode = [];
         for(let l = 0; l < lines.length; l++) {
             let line = lines[l];
-            let newline = line.replace(/highlight\(\d*\)/g , "highlightLine("+l+")");
+            let newline = line.replace(/highlightLine\(\d*\)/g , "highlightLine("+(l+1)+")");
             newcode.push(newline);
             pp(newline);
         }
@@ -393,5 +393,84 @@ function createWebWorker(code) {
                 </div>
             </div>
         </div>
+
+        <pre style="display:none;">
+            
+var p = 0.;
+var g = new p5.Gen();
+var speed = 0.01;
+
+function setup()
+{
+    createCanvas(400, 400);
+    flags = {};
+}
+
+
+function draw() {
+    let i = 0;
+    randomSeed(2);
+    background(0); 
+    fill("green");
+    ellipse(mouseX, mouseY, 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    
+    let d = 90;
+    if(d > 80) {
+        fill("orange");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+        fill("red");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+        fill("blue");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+        fill("cyan");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    }
+}
+
+
+
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+        </pre>
     </body>
 </html>
