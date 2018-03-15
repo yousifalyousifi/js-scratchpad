@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>JS Scratchpad</title>
+        <link href="css/bootstrap.4.0.0.min.cyborg.css" rel="stylesheet">
+        <link href="css/scratchpad.css" rel="stylesheet" media="screen">
+    </head>
+    <body>
+      
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">JS Scratchpad</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li id="runButton" title="Ctrl+R" class="nav-item">
+                        <a class="nav-link" href="#">Run</a>
+                    </li>
+                    <li id="clearButton" class="nav-item">
+                        <a class="nav-link" href="#">Clear</a>
+                    </li>
+                    <li id="p5RefButton" class="nav-item">
+                        <a class="nav-link" href="#">Reference</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="snippetsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Snippets
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="snippetsDropdown">
+                            <a id="loadButton" class="dropdown-item" href="#" data-toggle="modal" data-target="#myModal">Snippets</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="viewDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            View
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="viewDropdown">
+                            <a id="font14px" class="dropdown-item" href="#">14px</a>
+                            <a id="font18px" class="dropdown-item" href="#">18px</a>
+                            <a id="font24px" class="dropdown-item" href="#">24px</a>
+                            <div class="dropdown-divider"></div>
+                            <div id="ratioButtons" class="btn-group btn-group-toggle" data-toggle="buttons">
+                              <label class="btn btn-sm btn-secondary">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAUCAYAAADskT9PAAAAMUlEQVR42mM4fvz4/4HEDIPGAQx4ADFqSAWjDhh1wKgDRh0w6oBRB4w6YPA5YMS2iAA4TemfUvBlyAAAAABJRU5ErkJggg==" alt="20 80"/>
+                                <input type="radio" name="options" id="option1" checked>
+                              </label>
+                              <label class="btn btn-sm btn-secondary active">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAUCAYAAADskT9PAAAAMElEQVR42mM4fvz4/4HEDIPGAQxkAKroHXXAqANGHTDqgFEHjDpg1AGDxgEjtkUEADu36Z/FDLVCAAAAAElFTkSuQmCC" alt="50 50"/>
+                                <input type="radio" name="options" id="option2">
+                              </label>
+                              <label class="btn btn-sm btn-secondary">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAUCAYAAADskT9PAAAANklEQVR42mM4fvz4/4HEDIPGAQxUBMSYOeqAUQeMOmDUAaMOGHXAqANo7oBjx46R5oAR2yICADum6ZzjSufRAAAAAElFTkSuQmCC" alt="80 20"/>
+                                <input type="radio" name="options" id="option3"> 
+                              </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a id="wordWrap" class="dropdown-item" href="#">Enable Word Wrap</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Settings
+                        </a>
+                        <div class="dropdown-menu" id="settingsCheckbox" aria-labelledby="settingsDropdown">
+                          <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="autorunCheckbox">
+                            <label class="form-check-label" for="autorunCheckbox">Autorun p5
+                          </div>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="modeDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Mode
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="modeDropdown">
+                            <a id="consoleMode" class="dropdown-item" href="#">Console</span></a>
+                            <a id="drawMode" class="dropdown-item" href="#">Draw</a>
+                        </div>
+                    </li>
+
+                    <li id="b1" class="nav-item">
+                        <a class="nav-link" href="#">B1</a>
+                    </li>
+                    <li id="b2" class="nav-item">
+                        <a class="nav-link" href="#">B2</a>
+                    </li>
+                    <li id="b3" class="nav-item">
+                        <a class="nav-link" href="#">B3</a>
+                    </li>
+                    <li id="b4" class="nav-item">
+                        <a class="nav-link" href="#">B4</a>
+                    </li>
+                    <li id="b5" class="nav-item">
+                        <a class="nav-link" href="#">B5</a>
+                    </li>
+                    <li id="b6" class="nav-item">
+                        <a class="nav-link" href="#">B6</a>
+                    </li>
+                    <li id="b7" class="nav-item">
+                        <a class="nav-link" href="#">B7</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+<pre style="display: none;" id="defaultCode">
+function foo(items) {
+    var i;
+    for (i = 0; i &lt; items.length; i++) {
+        console.log("Ace Rocks " + items[i]);
+    }
+}
+
+
+</pre>
+        <div id="editorContainer">
+            <pre id="editor"></pre>
+        </div>
+        <div id="displayContainer">
+        </div>
+        <script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ace/ext-language_tools.js"></script>
+        <script src="js/jquery/jquery3.2.1.js"></script>
+        <script src="js/jquery/jquery.ba-throttle-debounce.min.js"></script>
+        <script src="js/bootstrap/bootstrap.4.0.0.min.js"></script>
+        <script src="js/acorn/acorn.js"></script>
+        <script src="js/acorn/acorn_loose.js"></script>
+        <script src="js/acorn/walk.js"></script>
+        <script src="js/acorn/walkall.js"></script>
+        <script src="js/p5/p5.js"></script>
+        <script src="js/p5/addons/p5.sound.js"></script>
+        <script src="js/p5/addons/p5.dom.js"></script>
+        <script src="js/p5/addons/p5.func.js"></script>
+        <script src="js/RateLimit.js"></script>
+        <script src="js/CodeRunner.js"></script>
+        <script src="js/DrawRunner.js"></script>
+        <script src="js/Scratchpad.js"></script>
+        <script>
+
+
+
+var editor = ace.edit("editor");
+Range = ace.require('ace/range').Range
+
+editor.setTheme("ace/theme/monokai");
+editor.session.setMode("ace/mode/javascript");
+editor.setOptions({
+    enableBasicAutocompletion: true,
+    enableLiveAutocompletion: false
+});
+function monokai() {console.log('monokai!');editor.setTheme("ace/theme/monokai");}
+function debugmonokai() {console.log('debugmonokai!');editor.setTheme("ace/theme/debugmonokai");}
+
+var storedCode = window.localStorage.getItem("code");
+if (storedCode) {
+    editor.setValue(storedCode);
+} else {editor.setValue("");}
+editor.gotoLine(editor.session.getLength() + 1);
+editor.commands.addCommand({
+    name: 'process',
+    bindKey: {
+        win: 'Ctrl-F',
+        mac: 'Command-F'
+    },
+    exec: function(editor) {
+        try {
+            console.log("processing.")
+            window.localStorage.setItem("code", editor.getValue());
+            process(editor.getValue());
+        } catch(e) {
+            console.error(e);
+        }
+        return false;
+    },
+    readOnly: false // false if this command should not apply in readOnly mode
+});
+
+window.pp = function() {
+    console.log.apply(null, arguments);
+};
+
+editor.container.addEventListener('click', function(e) {
+  // pp("CLICK");
+  // e.preventDefault();
+  // monokai();
+  // editor.selection.toSingleRange();
+  // editor.selection.clearSelection();
+  // forfeitHighlightControl = false;
+  // return false;
+}, false);
+
+
+hooks = {};
+highlightableSections = {};
+id = 0;
+forfeitHighlightControl = false;
+
+function process(code) {
+    let tokens = [];
+    let ast = acorn.parse(code, {
+        // collect ranges for each node
+        ranges: true,
+        locations: true,
+        // collect token ranges
+        onToken: tokens
+    });
+
+    // acorn.walk.simple(ast, {
+    //   Literal(node) {
+    //     console.log(`Found a literal: ${node.value}`)
+    //     console.log(node)
+    //   },
+    //   FunctionDeclaration(node) {
+    //     highlightLine(node.loc.start.line);
+    //     console.log(`Found a function: ${node.id.name}`)
+    //     console.log(node)
+    //   }
+    // });
+    let id = 0;
+    // acorn.walk.simple(ast, acorn.walkall.makeVisitors(function(node) {
+    //       console.log('Found node type', node.type);
+    //       highlightableSections[++id] = node;
+    //       console.log(id);
+    //       console.log(node);
+    //     }), acorn.walkall.traversers);
+
+    acorn.walk.ancestor(ast, acorn.walkall.makeVisitors(function(node, ancestors) {
+        console.log("");
+        console.log('Found node type', node.type);
+        let anc = ancestors.slice(0);
+        anc.reverse();
+        for(let a of anc) {
+            console.log(id);
+            console.log(a);
+            highlightableSections[++id] = a;
+        }
+    }), acorn.walkall.traversers);
+
+    console.log("");
+    console.log(highlightableSections);
+
+
+    worker = new Worker("worker.js");
+    // Test, used in all examples:
+    worker.onmessage = function(e) {
+        console.group("[main]");
+        console.log(e.data);
+        console.groupEnd();
+    };
+
+}
+
+    returnID = 0;
+    $("#b1").click(function(){
+        forfeitHighlightControl = true;
+        flags = {};
+        flags[returnID] = true;
+        returnID++;
+    });
+    $("#b2").click(function(){
+        returnID=0;
+        flags = {};
+    });
+    $("#b3").click(function(){
+        let code = editor.getValue();
+        let lines = code.split("\n");
+        let newcode = [];
+        for(let l = 0; l < lines.length; l++) {
+            let line = lines[l];
+            let newline = line.replace(/highlight\(\d*\)/g , "highlightLine("+l+")");
+            newcode.push(newline);
+            pp(newline);
+        }
+        let nc = newcode.join("\n");
+        pp(nc);
+        editor.setValue(nc);
+    });
+
+function getLines(code) {
+    let result = [];
+    let a = code.split('\n');
+    for (let s of a) {
+        result.push(s);
+    }
+    return result;
+}
+
+function insertHook(codeToEdit, line, column, id) {
+
+    return codeToEdit;
+}
+
+function highlightLine(lineNumber) {
+    if(forfeitHighlightControl) {
+        let l = lineNumber-1;
+        editor.selection.setRange(new Range(l, 0, l, 1000));
+        debugmonokai();
+    }
+}
+function highlightSection(sectionId) {
+    node = highlightableSections[sectionId];
+    console.log("");
+    console.log(sectionId);
+    console.log(node);
+    editor.selection.setRange(new Range(
+        node.loc.start.line-1,
+        node.loc.start.column,
+        node.loc.end.line-1,
+        node.loc.end.column
+        ));
+    debugmonokai();
+}
+
+function animateSections() {
+    function animator() {
+        id = 0;
+        return function() {
+            console.log(++id);
+            if(highlightableSections[id] == undefined) {
+                console.log("stopping");
+                clearInterval(window.handle);
+            } else {
+                highlightSection(id);
+            }
+        };
+    }
+    window.handle = setInterval(animator(), 200);
+
+    // setTimeout(function() {
+    //             clearInterval(window.handle);
+    // }, 5000);
+}
+
+function currentnode() {
+    console.log(id);
+    console.log(highlightableSections[id]);
+}
+
+
+function createWebWorker(code) {
+    // URL.createObjectURL
+    window.URL = window.URL || window.webkitURL;
+
+    // "Server response", used in all examples
+    var response = code;
+
+    var blob;
+    try {
+        blob = new Blob([response], {type: 'application/javascript'});
+    } catch (e) { // Backwards-compatibility
+        window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+        blob = new BlobBuilder();
+        blob.append(response);
+        blob = blob.getBlob();
+    }
+    return new Worker(URL.createObjectURL(blob));
+
+}
+
+
+        </script>
+        <div class="modal fade" id="myModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"> 
+                        <h4 class="modal-title" id="snippetsModalTitle">Snippets</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="snippetLoading"></span>
+                    </div>
+                    <div class="modal-body">
+                        <div style="max-height: 300px; overflow: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                <th>Snippet Number</th>
+                                <th>Snippet Title</th>
+                                </tr>
+                                </thead>
+                                <tbody id="snippetsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <span id="loadingGif" style="display:none;margin-right:20px;"><img src="loading.gif"/></span>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

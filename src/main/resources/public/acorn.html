@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link href="css/bootstrap.4.0.0.min.cyborg.css" rel="stylesheet">
+        <script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ace/ext-language_tools.js"></script>
+        <script src="js/jquery/jquery3.2.1.js"></script>
+        <script src="js/bootstrap/bootstrap.4.0.0.min.js"></script>
+        <script src="js/acorn/acorn.js"></script>
+        <script src="js/acorn/acorn_loose.js"></script>
+        <script src="js/acorn/walk.js"></script>
+        <script src="js/acorn/walkall.js"></script>
+
+    </head>
+    <style>
+
+#editor {
+    border-style: none;
+    margin: 0;
+    position: absolute;
+    top: 10px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+#editorContainer {
+    background-color: rgb(39,40,34);
+    margin: 0;
+    position: absolute;
+    top: 70px;
+    bottom: 0px;
+    left: 0;
+    right: 0%;
+}
+    </style>
+    <body>
+
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">JS Scratchpad</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li id="runButton" title="Ctrl+R" class="nav-item">
+                        <a class="nav-link" href="#">Run</a>
+                    </li>
+                    <li id="clearButton" class="nav-item">
+                        <a class="nav-link" href="#">Clear</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div id="editorContainer">
+            <pre id="editor"></pre>
+        </div>
+
+        <script type="text/javascript">
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
+
+var editor = ace.edit("editor");
+Range = ace.require('ace/range').Range
+
+editor.setTheme("ace/theme/monokai");
+editor.session.setMode("ace/mode/javascript");
+editor.setOptions({
+    enableBasicAutocompletion: true,
+    enableLiveAutocompletion: false
+});
+function monokai() {console.log('monokai!');editor.setTheme("ace/theme/monokai");}
+function debugmonokai() {console.log('debugmonokai!');editor.setTheme("ace/theme/debugmonokai");}
+
+var storedCode = window.localStorage.getItem("code");
+if (storedCode) {
+    editor.setValue(storedCode);
+} else {editor.setValue("");}
+editor.gotoLine(editor.session.getLength() + 1);
+editor.commands.addCommand({
+    name: 'run',
+    bindKey: {
+        win: 'Ctrl-R',
+        mac: 'Command-R'
+    },
+    exec: function(editor) {
+        try {
+            console.log("R");
+            window.localStorage.setItem("code", editor.getValue());
+            process(editor.getValue());
+        } catch(e) {
+            console.error(e);
+        }
+    },
+    readOnly: false // false if this command should not apply in readOnly mode
+});
+
+
+editor.container.addEventListener('click', function(e) {
+  e.preventDefault();
+  monokai();
+  return false;
+}, false);
+
+
+$("#runButton").click(function(){
+  clearInterval(window.handle);
+  id++;
+  highlightSection(id);
+});
+
+
+hooks = {};
+highlightableSections = {};
+id = 0;
+
+function process(code) {
+    let tokens = [];
+    let ast = acorn.parse(code, {
+        // collect ranges for each node
+        ranges: true,
+        locations: true,
+        // collect token ranges
+        onToken: tokens
+    });
+
+    // acorn.walk.simple(ast, {
+    //   Literal(node) {
+    //     console.log(`Found a literal: ${node.value}`)
+    //     console.log(node)
+    //   },
+    //   FunctionDeclaration(node) {
+    //     highlightLine(node.loc.start.line);
+    //     console.log(`Found a function: ${node.id.name}`)
+    //     console.log(node)
+    //   }
+    // });
+    let id = 0;
+    // acorn.walk.simple(ast, acorn.walkall.makeVisitors(function(node) {
+    //       console.log('Found node type', node.type);
+    //       highlightableSections[++id] = node;
+    //       console.log(id);
+    //       console.log(node);
+    //     }), acorn.walkall.traversers);
+
+    acorn.walk.ancestor(ast, acorn.walkall.makeVisitors(function(node, ancestors) {
+        console.log("");
+        console.log('Found node type', node.type);
+        let anc = ancestors.slice(0);
+        anc.reverse();
+        for(let a of anc) {
+            console.log(id);
+            console.log(a);
+            highlightableSections[++id] = a;
+        }
+    }), acorn.walkall.traversers);
+
+    console.log("");
+    console.log(highlightableSections);
+
+
+    worker = new Worker("worker.js");
+    // Test, used in all examples:
+    worker.onmessage = function(e) {
+        console.group("[main]");
+        console.log(e.data);
+        console.groupEnd();
+    };
+
+    $("#runButton").click(function(){
+        worker.postMessage({
+            startTime: (new Date().getTime()),
+            duration: 1000
+        });
+    });
+}
+
+function getLines(code) {
+    let result = [];
+    let a = code.split('\n');
+    for (let s of a) {
+        result.push(s);
+    }
+    return result;
+}
+
+function insertHook(codeToEdit, line, column, id) {
+
+    return codeToEdit;
+}
+
+function highlightLine(lineNumber) {
+    let l = lineNumber-1;
+    editor.selection.setRange(new Range(l, 0, l, 1000));
+    debugmonokai();
+}
+function highlightSection(sectionId) {
+    node = highlightableSections[sectionId];
+    console.log("");
+    console.log(sectionId);
+    console.log(node);
+    editor.selection.setRange(new Range(
+        node.loc.start.line-1,
+        node.loc.start.column,
+        node.loc.end.line-1,
+        node.loc.end.column
+        ));
+    debugmonokai();
+}
+
+function animateSections() {
+    function animator() {
+        id = 0;
+        return function() {
+            console.log(++id);
+            if(highlightableSections[id] == undefined) {
+                console.log("stopping");
+                clearInterval(window.handle);
+            } else {
+                highlightSection(id);
+            }
+        };
+    }
+    window.handle = setInterval(animator(), 200);
+
+    // setTimeout(function() {
+    //             clearInterval(window.handle);
+    // }, 5000);
+}
+
+function currentnode() {
+    console.log(id);
+    console.log(highlightableSections[id]);
+}
+
+
+function createWebWorker(code) {
+    // URL.createObjectURL
+    window.URL = window.URL || window.webkitURL;
+
+    // "Server response", used in all examples
+    var response = code;
+
+    var blob;
+    try {
+        blob = new Blob([response], {type: 'application/javascript'});
+    } catch (e) { // Backwards-compatibility
+        window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+        blob = new BlobBuilder();
+        blob.append(response);
+        blob = blob.getBlob();
+    }
+    return new Worker(URL.createObjectURL(blob));
+
+}
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+        </script>
+    </body>
+</html>
