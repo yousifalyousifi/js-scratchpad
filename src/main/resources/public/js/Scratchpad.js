@@ -9,8 +9,13 @@ $(document).ready(function() {
     var runner = codeRunner; 
 
     var appProps = {};
-
-    consoleMode();
+    
+    var storedMode = window.localStorage.getItem("mode");
+    if(storedMode && storedMode == "draw") {
+        drawMode();
+    } else {
+        consoleMode();
+    }
 
     var editor = ace.edit("editor");
 
@@ -18,7 +23,7 @@ $(document).ready(function() {
     editor.session.setMode("ace/mode/javascript");
     editor.setOptions({
         enableBasicAutocompletion: true,
-        enableLiveAutocompletion: false
+        enableLiveAutocompletion: true
     });
 
     var storedCode = window.localStorage.getItem("code");
@@ -146,10 +151,12 @@ $(document).ready(function() {
     });
 
     $("#consoleMode").click(function() {
+        window.localStorage.setItem("mode", "console");
     	consoleMode();
     });
 
     $("#drawMode").click(function() {
+        window.localStorage.setItem("mode", "draw");
     	drawMode();
     });
 
