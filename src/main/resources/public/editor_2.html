@@ -256,6 +256,7 @@ function process(code) {
     returnID = 0;
     $("#b1").click(function(){
         forfeitHighlightControl = true;
+        pp("returnId", returnID);
         flags = {};
         flags[returnID] = true;
         returnID++;
@@ -272,11 +273,13 @@ function process(code) {
             let line = lines[l];
             let newline = line.replace(/highlightLine\(\d*\)/g , "highlightLine("+(l+1)+")");
             newcode.push(newline);
-            pp(newline);
         }
         let nc = newcode.join("\n");
-        pp(nc);
         editor.setValue(nc);
+    });
+
+    $("#b4").click(function(){//start the automated i-changing via shared memory and a worker
+        
     });
 
 function getLines(code) {
@@ -297,7 +300,8 @@ function highlightLine(lineNumber) {
     if(forfeitHighlightControl) {
         let l = lineNumber-1;
         editor.selection.setRange(new Range(l, 0, l, 1000));
-        debugmonokai();
+        // debugmonokai();
+        // pp(l);
     }
 }
 function highlightSection(sectionId) {
@@ -395,7 +399,6 @@ function createWebWorker(code) {
         </div>
 
         <pre style="display:none;">
-            
 var p = 0.;
 var g = new p5.Gen();
 var speed = 0.01;
@@ -403,31 +406,81 @@ var speed = 0.01;
 function setup()
 {
     createCanvas(400, 400);
-    flags = {};
 }
-
+allFlags = {};
+allFlags["draw"]={};
+flags = allFlags["draw"];
+callerFlags = {};
+        flags[0] = true;
+    var i =0;
 
 function draw() {
-    let i = 0;
+    i =0;
+    try{
     randomSeed(2);
     background(0); 
     fill("green");
-    ellipse(mouseX, mouseY, 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-    ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    // ellipse(mouseX, mouseY, 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(22);throw {type:"return"};}
+    // ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(23);throw {type:"return"};}
+    // ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(24);throw {type:"return"};}
+    // ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(25);throw {type:"return"};}
+    // ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(26);throw {type:"return"};}
+    // ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(27);throw {type:"return"};}
+    // ellipse(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(28);throw {type:"return"};}
     
-    let d = 90;
-    if(d > 80) {
-        fill("orange");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-        fill("red");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-        fill("blue");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
-        fill("cyan");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine();return;}
+    // allFlags["foo"]={};
+    // callerFlags["foo"] = {index:i, flags:flags};
+    // foo();
+    
+
+    // let d = 70;
+    // if(d > 80) {
+    //     fill("orange");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(37);throw {type:"return"};}
+    //     fill("red");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(38);throw {type:"return"};}
+    //     fill("blue");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(39);throw {type:"return"};}
+    //     fill("cyan");rect(random(width), random(height), 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(40);throw {type:"return"};}
+    // }
+    
+    for(let n = 0; n < 2; n++) {
+        if(flags[i++]) {highlightLine(44);throw {type:"return"};}
+        fill("cyan");rect(n*15+100, n*15+100, 20,20);if(flags[i++]) {highlightLine(45);throw {type:"return"};}
     }
+    
+    if(flags[i++]) {highlightLine(48);throw {type:"return"};}
+    if(flags[i++]) {highlightLine(49);throw {type:"return"};}
+    let g = 0;
+    while(g < 2) {
+        let inf_i=i;if(flags[i++]) {highlightLine(52);pp(i);throw {type:"return"};}
+        fill("red");rect(g*15+100, g*15+200, 20,20);if(flags[i++]) {highlightLine(53);throw {type:"return"};}
+        if(flags[i++]) {i = inf_i;flags={};flags[i]=true;returnID=i+1;highlightLine(54);throw {type:"return"};}
+        g++;
+    }
+    }catch(e) {
+        if(e.type && e.type == "return") {
+            
+        } else {
+            throw e;
+        }
+    }
+    
+    allFlags["draw"]={};
 }
+
+function foo() {
+    let i = callerFlags["foo"].index;
+    let flags = callerFlags["foo"].flags;
+    fill("yellow");rect( 80, 80, 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(71);throw {type:"return"};}
+    fill("yellow");rect( 80, 80, 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(72);throw {type:"return"};}
+    fill("yellow");rect( 80, 80, 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(73);throw {type:"return"};}
+    fill("yellow");rect( 80, 80, 20+random(20), 30+random(50));if(flags[i++]) {highlightLine(74);throw {type:"return"};}
+     
+}
+
+
+
+
+
+
 
 
 
