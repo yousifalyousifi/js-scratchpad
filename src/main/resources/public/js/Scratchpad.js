@@ -160,9 +160,6 @@ $(document).ready(function() {
     	drawMode();
     });
 
-
-
-
     function consoleMode() {
         if(mode == "console") {return;}
         drawRunner.exitMode();
@@ -254,6 +251,42 @@ $(document).ready(function() {
         })
         .fail(function( msg ) {
           console.error("Failed to get snippets...");
+          console.error( msg );
+        });
+    }
+
+    function login(username, password) {
+        $.ajax({
+          method: "POST",
+          url: "/login",
+          data: {
+            username: username,
+            password: password
+          }
+        })
+        .done(function( msg ) {
+
+        })
+        .fail(function( msg ) {
+          console.error("Failed to login...");
+          console.error( msg );
+        });
+    }
+
+    function register(username, password) {
+        $.ajax({
+          method: "POST",
+          url: "/register",
+          data: {
+            username: username,
+            password: password
+          }
+        })
+        .done(function( msg ) {
+
+        })
+        .fail(function( msg ) {
+          console.error("Failed to register...");
           console.error( msg );
         });
     }
