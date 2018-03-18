@@ -85,41 +85,6 @@
         </nav>
 
 <pre style="display: none;" id="defaultCode">
-function foo(items) {
-    var i;
-    for (i = 0; i &lt; items.length; i++) {
-        console.log("Ace Rocks " + items[i]);
-    }
-}
-foo(["hi",2]);
-var obj = {};
-var objj = {key: "value", key2: 2, "key3": null, "key4": undefined};
-var arr = [];
-var arrr = ["adwd", undefined, 23, 93, "231", null];
-
-console.log(obj);
-console.log(foo);
-console.log(objj);
-console.log(arr);
-console.log(arrr);
-console.error("My error");
-console.log(324);
-console.log("strrrrIng://", 123, true, foo);
-console.log(true);
-//g();
-
-function setup() {
-    createCanvas(500,500);
-}
-
-function draw() {
-    background(182, 208, 249);
-    let spacing = 30;
-    let value = abs(sin(frameCount/50));
-    let h = (height-spacing*2)*(value);
-    rect(spacing, spacing+(h), width-spacing*2, height-2*spacing-h);
-}
-
 </pre>
         <div id="editorContainer">
             <pre id="editor"></pre>
