@@ -19,13 +19,16 @@ import java.util.jar.JarFile;
 
 public class SnippetsUtil {
 
+	public static void main(String[] args) {
+		SnippetsUtil.createTable();
+	}
 	static String path = "/snippets/";
 	
 	public static void createTable() {
 		
-		try (Connection connection = DatabaseUtil.getDatasource().getConnection()) {
+		try (Connection connection = DatabaseUtil.getDatasource().getConnection();
+				Statement stmt = connection.createStatement();) {
 
-			Statement stmt = connection.createStatement();
 			stmt.execute("DROP TABLE IF EXISTS snippets;");
 			stmt.execute("CREATE TABLE snippets("
 					+ "id integer PRIMARY KEY, "
@@ -47,11 +50,12 @@ public class SnippetsUtil {
 					String[] parts = filename.split("_");
 					String id = parts[0];
 					String snippet = getResourceFile(path + filename);
-					PreparedStatement ps = connection.prepareStatement("INSERT INTO snippets VALUES (?, ?, ?);");
-					ps.setInt(1, Integer.parseInt(id));
-					ps.setString(2, title);
-					ps.setString(3, snippet);
-					ps.execute();
+					try(PreparedStatement ps = connection.prepareStatement("INSERT INTO snippets VALUES (?, ?, ?);");) {
+						ps.setInt(1, Integer.parseInt(id));
+						ps.setString(2, title);
+						ps.setString(3, snippet);
+						ps.execute();
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
