@@ -1,6 +1,8 @@
 package jsscratchpad;
 import static spark.Spark.get;
 import static spark.Spark.port;
+import static spark.Spark.before;
+import static spark.Spark.halt;
 import static spark.Spark.post;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.stop;
@@ -9,8 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import spark.ModelAndView;
+import spark.Session;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 
@@ -37,7 +38,7 @@ public class Main {
 	        final FreeMarkerEngine dbEngine = new FreeMarkerEngine(cfg);
 	        final Gson gson = new Gson();
 			final DataSource dataSource = DatabaseUtil.getDatasource();
-			SnippetsUtil.createTable();
+			SnippetUtil.createTable();
 			UserUtil.createTable();
 	        
 			port(Integer.valueOf(System.getenv("PORT")));
@@ -46,12 +47,17 @@ public class Main {
 			final CanvasViewer viewer = new CanvasViewer();
 			Spark.webSocket("/sketch/connect", viewer);
 
-			get("/users", (request, response) -> {
-				return UserUtil.getAllUsers();
-			}, gson::toJson);
+//			get("/users", (request, response) -> {
+//				return UserUtil.getAllUsers();
+//			}, gson::toJson);
 			
-			get("/login/:u/:p", (req, res) -> {
-				if(UserUtil.verify(req.params(":u"), req.params(":p"))) {
+			post("/login", (req, res) -> {
+				String username = req.queryParams("username");
+				String password = req.queryParams("password");
+				if(UserUtil.verify(username, password)) {
+					res.cookie("loggedin", "true");
+					Session s = req.session(true);
+					s.attribute("username", username);
 					res.status(200);
 				} else {
 					res.status(403);
@@ -59,8 +65,46 @@ public class Main {
 				return "";
 			});
 			
-			get("/register/:u/:p", (req, res) -> {
-				if(UserUtil.register(req.params(":u"), req.params(":p"))) {
+			post("/logout", (req, res) -> {
+				Session s = req.session();
+				if(s != null) {
+					s.attribute("username", null);
+					s.invalidate();
+					res.status(200);
+				} else {
+					res.status(400);
+				}
+				return "";
+			});
+
+//			before("/private/*", (request, response) -> {
+//			    if(request.session() == null || request.session().attribute("username") == null) {
+//				    halt(401, "Go Away!");
+//			    }
+//			});
+			
+//			get("/login/:u/:p", (req, res) -> {
+//				if(UserUtil.verify(req.params(":u"), req.params(":p"))) {
+//					res.status(200);
+//				} else {
+//					res.status(403);
+//				}
+//				return "";
+//			});
+//
+//			get("/register/:u/:p", (req, res) -> {
+//				if(UserUtil.register(req.params(":u"), req.params(":p"))) {
+//					res.status(200);
+//				} else {
+//					res.status(403);
+//				}
+//				return "";
+//			});
+
+			post("/register", (req, res) -> {
+				String username = req.queryParams("username");
+				String password = req.queryParams("password");
+				if(UserUtil.register(username, password)) {
 					res.status(200);
 				} else {
 					res.status(403);
@@ -78,7 +122,7 @@ public class Main {
 				res.type("application/json");
 				try (Connection connection = dataSource.getConnection();
 					Statement stmt = connection.createStatement();
-					ResultSet rs = stmt.executeQuery("SELECT * FROM snippets;");) {
+					ResultSet rs = stmt.executeQuery("SELECT * FROM snippet;");) {
 					
 					ArrayList<Snippet> output = new ArrayList<Snippet>();
 					while (rs.next()) {
@@ -99,7 +143,7 @@ public class Main {
 				System.out.println(req.params(":snippetId"));
 				res.type("application/json");
 				try (Connection connection = dataSource.getConnection();
-					PreparedStatement stmt = connection.prepareStatement("SELECT * FROM snippets WHERE id = ?;");) {
+					PreparedStatement stmt = connection.prepareStatement("SELECT * FROM snippet WHERE id = ?;");) {
 					
 					stmt.setInt(1, Integer.parseInt(req.params(":snippetId")));
 					

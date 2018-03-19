@@ -16,6 +16,7 @@ $(document).ready(function() {
     } else {
         consoleMode();
     }
+    guestMode();
 
     var editor = ace.edit("editor");
 
@@ -23,7 +24,7 @@ $(document).ready(function() {
     editor.session.setMode("ace/mode/javascript");
     editor.setOptions({
         enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true
+        enableLiveAutocompletion: false
     });
 
     var storedCode = window.localStorage.getItem("code");
@@ -150,6 +151,111 @@ $(document).ready(function() {
         e.stopPropagation();
     });
 
+    //This stops the dropdown from closing on click
+    // $('#viewDropdownMenu').click(function(e) {
+    //     e.stopPropagation();
+    // });
+
+    $('#registerModal .submitModal').click(function() {
+        console.log("register submit");
+        let u = $("#usernameRegisterInput").val();
+        let p = $("#passwordRegisterInput").val();
+        let rp = $("#passwordRetypeRegisterInput").val();
+        if(p == rp) {
+            $('#registerModal .submitModal').attr("disabled", "disabled");
+            register(u, p, 
+                function success(msg) {
+                    showStatus("Success", "GreenYellow");
+                    $('#registerModal .submitModal').removeAttr("disabled");
+                    clearAllUserModalInputs();
+                },
+                function fail(msg) {
+                    showStatus("Failed: " + msg, "Crimson");
+                    $('#registerModal .submitModal').removeAttr("disabled");
+            });
+        } else {
+            showStatus("Passwords don't match", "Crimson");
+        }
+        function showStatus(text, color) {showModalStatus("registerModal", text, color);}
+        return false;
+    }); 
+
+    $('#loginModal .submitModal').click(function() {
+        console.log("login submit");
+        let u = $("#usernameLoginInput").val();
+        let p = $("#passwordLoginInput").val();
+        $('#loginModal .submitModal').attr("disabled", "disabled");
+        login(u, p, 
+            function success(msg) {
+                showStatus("Success", "GreenYellow");
+                $('#loginModal .submitModal').removeAttr("disabled");
+                userMode();
+                clearAllUserModalInputs();
+            },
+            function fail(msg) {
+                showStatus("Failed: " + msg, "Crimson");
+                $('#loginModal .submitModal').removeAttr("disabled");
+        });
+        function showStatus(text, color) {showModalStatus("loginModal", text, color);}
+        return false;
+    }); 
+
+    $('#loginModal, #registerModal').on("hidden.bs.modal", function() {
+        console.log("clearall");
+        clearAllUserModalInputs();
+        clearAllUserModalStatuses();
+    }); 
+
+    $('#loginModal').on("shown.bs.modal", function() {
+        $("#usernameLoginInput").focus();
+    }); 
+
+    $('#registerModal').on("shown.bs.modal", function() {
+        $("#usernameRegisterInput").focus();
+    }); 
+
+    $("#logOut").click(function() {
+        logout(
+        function success() {
+            guestMode();
+        }
+        , 
+        function fail() {console.error("Log out failed")});
+    });
+
+    function userMode() {
+        $(".guestControl").hide();
+        $(".userControl").show();
+    };
+    function guestMode() {
+        $(".guestControl").show();
+        $(".userControl").hide();
+    };
+
+    function showModalStatus(modalId, text, color) {
+        let el = $("#" + modalId + " .modalStatus");
+        el.text(text);
+        el.css("color", color);
+    }
+
+
+    function clearAllUserModalInputs() {
+        $("#usernameRegisterInput").val("");
+        $("#passwordRegisterInput").val("");
+        $("#passwordRetypeRegisterInput").val("");
+        $("#usernameLoginInput").val("");
+        $("#passwordLoginInput").val("");
+    }
+
+    function clearAllUserModalStatuses() {
+        let el;
+        el = $("#registerModal .modalStatus");
+        el.text("");
+        el = $("#loginModal .modalStatus");
+        el.text("");
+    }
+
+
     $("#consoleMode").click(function() {
         window.localStorage.setItem("mode", "console");
     	consoleMode();
@@ -194,7 +300,7 @@ $(document).ready(function() {
             editor.setValue(snippet.snippet);
             editor.gotoLine(editor.session.getLength() + 1);
             $("#loadingGif").hide();
-            $('#myModal').modal('hide');
+            $('#snippetsModal').modal('hide');
         })
         .fail(function( msg ) {
           console.error("Failed to get snippet " + snippetIndex);
@@ -255,7 +361,7 @@ $(document).ready(function() {
         });
     }
 
-    function login(username, password) {
+    function login(username, password, success, fail) {
         $.ajax({
           method: "POST",
           url: "/login",
@@ -264,16 +370,20 @@ $(document).ready(function() {
             password: password
           }
         })
-        .done(function( msg ) {
-
-        })
-        .fail(function( msg ) {
-          console.error("Failed to login...");
-          console.error( msg );
-        });
+        .done(success)
+        .fail(fail);
     }
 
-    function register(username, password) {
+    function logout(success, fail) {
+        $.ajax({
+          method: "POST",
+          url: "/logout"
+        })
+        .done(success)
+        .fail(fail);
+    }
+
+    function register(username, password, success, fail) {
         $.ajax({
           method: "POST",
           url: "/register",
@@ -282,13 +392,8 @@ $(document).ready(function() {
             password: password
           }
         })
-        .done(function( msg ) {
-
-        })
-        .fail(function( msg ) {
-          console.error("Failed to register...");
-          console.error( msg );
-        });
+        .done(success)
+        .fail(fail);
     }
 
 });

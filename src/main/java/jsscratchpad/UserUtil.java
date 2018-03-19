@@ -16,8 +16,8 @@ public class UserUtil {
 		DataSource dataSource = DatabaseUtil.getDatasource();
 		try (Connection connection = dataSource.getConnection();
 				Statement stmt = connection.createStatement()) {
-				stmt.execute("DROP TABLE IF EXISTS users;");
-				stmt.execute("CREATE TABLE users("
+				//stmt.execute("DROP TABLE IF EXISTS user;");
+				stmt.execute("CREATE TABLE IF NOT EXISTS user("
 						+ "id serial primary key, "
 						+ "username VARCHAR(32) NOT NULL, "
 						+ "password VARCHAR(80) NOT NULL,"
