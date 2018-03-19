@@ -22,5 +22,4 @@ public class Snippet {
 	public void setSnippet(String snippet) {
 		this.snippet = snippet;
 	}
-	
 }
