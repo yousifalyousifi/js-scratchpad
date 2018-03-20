@@ -41,8 +41,9 @@ public class DatabaseUtil {
 			HikariConfig config = new HikariConfig();
 			config.setJdbcUrl(dbUrl);
 			config.setDriverClassName("org.postgresql.Driver");
-			dataSource = (config.getJdbcUrl() != null) ? new HikariDataSource(config)
-					: new HikariDataSource();
+			config.setMaximumPoolSize(2);
+			config.setPoolName("LocalHikariPool");
+			dataSource = new HikariDataSource(config);
 		    return dataSource;
 		} catch (Exception e) {
 			e.printStackTrace();
