@@ -17,17 +17,20 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class SnippetsUtil {
+public class SnippetUtil {
 
+	public static void main(String[] args) {
+		SnippetUtil.createTable();
+	}
 	static String path = "/snippets/";
 	
 	public static void createTable() {
 		
-		try (Connection connection = DatabaseUtil.getDatasource().getConnection()) {
+		try (Connection connection = DatabaseUtil.getDatasource().getConnection();
+				Statement stmt = connection.createStatement();) {
 
-			Statement stmt = connection.createStatement();
-			stmt.execute("DROP TABLE IF EXISTS snippets;");
-			stmt.execute("CREATE TABLE snippets("
+			stmt.execute("DROP TABLE IF EXISTS snippet;");
+			stmt.execute("CREATE TABLE snippet("
 					+ "id integer PRIMARY KEY, "
 					+ "title VARCHAR(100) NOT NULL, "
 					+ "snippet VARCHAR(5000) NOT NULL);");
@@ -47,11 +50,12 @@ public class SnippetsUtil {
 					String[] parts = filename.split("_");
 					String id = parts[0];
 					String snippet = getResourceFile(path + filename);
-					PreparedStatement ps = connection.prepareStatement("INSERT INTO snippets VALUES (?, ?, ?);");
-					ps.setInt(1, Integer.parseInt(id));
-					ps.setString(2, title);
-					ps.setString(3, snippet);
-					ps.execute();
+					try(PreparedStatement ps = connection.prepareStatement("INSERT INTO snippet VALUES (?, ?, ?);");) {
+						ps.setInt(1, Integer.parseInt(id));
+						ps.setString(2, title);
+						ps.setString(3, snippet);
+						ps.execute();
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -94,7 +98,7 @@ public class SnippetsUtil {
 	private static InputStream getResourceAsStream(String resource) {
 		final InputStream in = getContextClassLoader().getResourceAsStream(resource);
 		
-		return in == null ? SnippetsUtil.class.getResourceAsStream(resource) : in;
+		return in == null ? SnippetUtil.class.getResourceAsStream(resource) : in;
 	}
 
 	private static ClassLoader getContextClassLoader() {
@@ -104,7 +108,7 @@ public class SnippetsUtil {
 	//http://stackoverflow.com/a/20073154/1987694
 	public static List<String> getFolderContents(String path) {
 		try {
-			final File jarFile = new File(SnippetsUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+			final File jarFile = new File(SnippetUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 			if(jarFile.isFile()) {  // Run with JAR file
 			    final JarFile jar = new JarFile(jarFile);
 			    final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
@@ -117,7 +121,7 @@ public class SnippetsUtil {
 			    }
 			    jar.close();
 			} else { // Run with IDE
-			    final URL url = SnippetsUtil.class.getResource(path);
+			    final URL url = SnippetUtil.class.getResource(path);
 			    if (url != null) {
 			        try {
 			            final File apps = new File(url.toURI());

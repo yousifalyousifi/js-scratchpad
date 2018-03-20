@@ -8,3 +8,5 @@ src/main/resources/public/ace-builds-master
 ace-builds-master
 bootstrap-3.3.7-dist
 .vscode/
+src/main/resources/public/open-iconic/
+node_modules/

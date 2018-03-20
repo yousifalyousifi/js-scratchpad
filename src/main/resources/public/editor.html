@@ -30,14 +30,14 @@
                             Snippets
                         </a>
                         <div class="dropdown-menu" aria-labelledby="snippetsDropdown">
-                            <a id="loadButton" class="dropdown-item" href="#" data-toggle="modal" data-target="#myModal">Snippets</a>
+                            <a id="loadButton" class="dropdown-item" href="#" data-toggle="modal" data-target="#snippetsModal">Snippets</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="viewDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             View
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="viewDropdown">
+                        <div class="dropdown-menu" id="viewDropdownMenu" aria-labelledby="viewDropdown">
                             <a id="font14px" class="dropdown-item" href="#">14px</a>
                             <a id="font18px" class="dropdown-item" href="#">18px</a>
                             <a id="font24px" class="dropdown-item" href="#">24px</a>
@@ -81,45 +81,29 @@
                         </div>
                     </li>
                 </ul>
+                
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                      <a class="userControl nav-link" href="#">Save</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="userControl nav-link" href="#">Load</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            User
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
+                            <a id="logOut" class="userControl dropdown-item" href="#">Log Out</span></a>
+                            <a id="logIn" class="guestControl dropdown-item" href="#" data-toggle="modal" data-target="#loginModal">Log In</span></a>
+                            <a id="register" class="guestControl dropdown-item" href="#" data-toggle="modal" data-target="#registerModal">Register</a>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </nav>
 
 <pre style="display: none;" id="defaultCode">
-function foo(items) {
-    var i;
-    for (i = 0; i &lt; items.length; i++) {
-        console.log("Ace Rocks " + items[i]);
-    }
-}
-foo(["hi",2]);
-var obj = {};
-var objj = {key: "value", key2: 2, "key3": null, "key4": undefined};
-var arr = [];
-var arrr = ["adwd", undefined, 23, 93, "231", null];
-
-console.log(obj);
-console.log(foo);
-console.log(objj);
-console.log(arr);
-console.log(arrr);
-console.error("My error");
-console.log(324);
-console.log("strrrrIng://", 123, true, foo);
-console.log(true);
-//g();
-
-function setup() {
-    createCanvas(500,500);
-}
-
-function draw() {
-    background(182, 208, 249);
-    let spacing = 30;
-    let value = abs(sin(frameCount/50));
-    let h = (height-spacing*2)*(value);
-    rect(spacing, spacing+(h), width-spacing*2, height-2*spacing-h);
-}
-
 </pre>
         <div id="editorContainer">
             <pre id="editor"></pre>
@@ -134,13 +118,14 @@ function draw() {
         <script src="js/p5/p5.js"></script>
         <script src="js/p5/addons/p5.sound.js"></script>
         <script src="js/p5/addons/p5.dom.js"></script>
+        <script src="js/p5/addons/p5.func.js"></script>
         <script src="js/RateLimit.js"></script>
         <script src="js/CodeRunner.js"></script>
         <script src="js/DrawRunner.js"></script>
         <script src="js/Scratchpad.js"></script>
         <script>
         </script>
-        <div class="modal fade" id="myModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
+        <div class="modal fade" id="snippetsModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header"> 
@@ -166,6 +151,70 @@ function draw() {
                     </div>
                     <div class="modal-footer">
                         <span id="loadingGif" style="display:none;margin-right:20px;"><img src="loading.gif"/></span>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="loginModal" role="dialog" aria-labelledby="loginModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"> 
+                        <h4 class="modal-title" id="loginModalTitle">Login</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                          <div class="form-group">
+                            <label for="usernameLoginInput" class="col-form-label">Username:</label>
+                            <input type="text" class="form-control" id="usernameLoginInput">
+                          </div>
+                          <div class="form-group">
+                            <label for="passwordLoginInput" class="col-form-label">Password:</label>
+                            <input type="password" class="form-control" id="passwordLoginInput">
+                          </div>
+                        <button class="submitModal btn btn-primary mr-auto">Submit</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <span class="modalStatus"></span>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="registerModal" role="dialog" aria-labelledby="registerModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"> 
+                        <h4 class="modal-title" id="registerModalTitle">Register</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                          <div class="form-group">
+                            <label for="usernameRegisterInput" class="col-form-label">Username:</label>
+                            <input type="text" class="form-control" id="usernameRegisterInput">
+                          </div>
+                          <div class="form-group">
+                            <label for="passwordRegisterInput" class="col-form-label">Password:</label>
+                            <input type="password" class="form-control" id="passwordRegisterInput">
+                          </div>
+                          <div class="form-group">
+                            <label for="passwordRetypeRegisterInput" class="col-form-label">Re-type Password:</label>
+                            <input type="password" class="form-control" id="passwordRetypeRegisterInput">
+                          </div>
+                          <button class="submitModal btn btn-primary mr-auto">Submit</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <span class="modalStatus"></span>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>

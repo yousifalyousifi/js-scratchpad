@@ -1,7 +1,5 @@
 package jsscratchpad;
 
-import java.util.UUID;
-
 import com.lambdaworks.crypto.SCryptUtil;
 
 public class PasswordUtil {
