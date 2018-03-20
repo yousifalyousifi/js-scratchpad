@@ -82,22 +82,22 @@
                     </li>
 
                     <li id="b1" class="nav-item">
-                        <a class="nav-link" href="#">B1</a>
+                        <a class="nav-link" href="#">start stepping</a>
                     </li>
                     <li id="b2" class="nav-item">
-                        <a class="nav-link" href="#">B2</a>
+                        <a class="nav-link" href="#">stop stepping</a>
                     </li>
                     <li id="b3" class="nav-item">
-                        <a class="nav-link" href="#">B3</a>
+                        <a class="nav-link" href="#">fill line numbers</a>
                     </li>
                     <li id="b4" class="nav-item">
-                        <a class="nav-link" href="#">B4</a>
+                        <a class="nav-link" href="#">start auto step</a>
                     </li>
                     <li id="b5" class="nav-item">
-                        <a class="nav-link" href="#">B5</a>
+                        <a class="nav-link" href="#">stop auto step</a>
                     </li>
                     <li id="b6" class="nav-item">
-                        <a class="nav-link" href="#">B6</a>
+                        <a class="nav-link" href="#">toggle code</a>
                     </li>
                     <li id="b7" class="nav-item">
                         <a class="nav-link" href="#">B7</a>
@@ -264,7 +264,8 @@ function process(code) {
     returnID = 0;
     $("#b1").click(function(){
         if(stepping == true) {
-            returnID++;
+            // returnID++;
+            window.returnIDFloat += 1;
         }
         forfeitHighlightControl = true;
         pp("returnId", returnID);
@@ -299,15 +300,37 @@ function process(code) {
 
         if(window.autoplay) clearInterval(window.autoplay);
         window.autoplay = setInterval(function() {
-            pp("auto returnId", returnID, returnID+1);
-            flags[returnID] = true;
-            returnID++;
-        },window.autointerval||500);
+            // pp("auto returnId", returnID, returnID+1);
+            // returnID++;
+            window.returnIDFloat += window.autostep||0.1;
+        },window.autointerval||1);
     });
     $("#b5").click(function(){//start the automated i-changing via shared memory
         forfeitHighlightControl = false;
         stepping = false;
         if(window.autoplay) clearInterval(window.autoplay);
+    });
+
+    isViewingDecoratedCode = false;
+    decoratedCode = "";
+    undecoratedCode = "";
+    $("#b6").click(function(){
+        console.log("toggling");
+        let code = editor.getValue();
+        if(isViewingDecoratedCode) {
+
+            isViewingDecoratedCode = false;
+            editor.setValue(undecoratedCode);
+        } else {
+            undecoratedCode = code;
+            
+            //create decorated code
+
+            
+
+            //editor.setValue(decoratedCode);
+            isViewingDecoratedCode = true;
+        }
     });
 
 function getLines(code) {
@@ -432,20 +455,20 @@ var speed = 0.01;
 
 function setup()
 {
-    createCanvas(400, 400);
+    createCanvas(600, 600);
 }
 
-allFlags = {};
-allFlags["draw"]={};
-flags = allFlags["draw"];
 callerFlags = {};
-flags[0] = true;
+globalFuncCallStack = [];
 var i =0;
 fakeFrameCount = 0;
 fakeMouseX = 0;
 fakeMouseY = 0;
 
 var dummy = {};
+
+returnIDFloat = 0;
+infiniteLoopPresent = true;
 
 function draw() {
     i =-1;
@@ -455,107 +478,122 @@ function draw() {
     mouseX = fakeMouseX;
     mouseY = fakeMouseY;
     try{
-    randomSeed(2427436);
-    background(0); 
-    fill("white");
-    // if(stepping&&++i==returnID) {highlightLine(33);throw {type:"return"};}
-    text(frameCount, 120,20);
-    // let size = random(50);
-    // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i==returnID) {highlightLine(36);throw {type:"return"};}
-    // size = random(50);
-    // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i==returnID) {highlightLine(38);throw {type:"return"};}
-    // size = random(50);
-    // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i==returnID) {highlightLine(40);throw {type:"return"};}
-    // size = random(50);
-    // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i==returnID) {highlightLine(42);throw {type:"return"};}
-    // size = random(50);
-    // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i==returnID) {highlightLine(44);throw {type:"return"};}
-    // size = random(50);
-    // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i==returnID) {highlightLine(46);throw {type:"return"};}
-    
-   ellipse(mouseX, mouseY, 50,70);
-    if(stepping&&++i==returnID) {highlightLine(49);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+20,50+20, 50,70);if(stepping&&++i==returnID) {highlightLine(50);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(52);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+25,50+25, 50,70);if(stepping&&++i==returnID) {highlightLine(53);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(55);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+30,50+30, 50,70);if(stepping&&++i==returnID) {highlightLine(56);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(58);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+35,50+35, 50,70);if(stepping&&++i==returnID) {highlightLine(59);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(61);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+40,50+40, 50,70);if(stepping&&++i==returnID) {highlightLine(62);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(64);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+45,50+45, 50,70);if(stepping&&++i==returnID) {highlightLine(65);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(67);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+50,50+50, 50,70);if(stepping&&++i==returnID) {highlightLine(68);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(70);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+55,50+55, 50,70);if(stepping&&++i==returnID) {highlightLine(71);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(73);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+60,50+60, 50,70);if(stepping&&++i==returnID) {highlightLine(74);throw {type:"return"};}
-    }
-    if(stepping&&++i==returnID) {highlightLine(76);throw {type:"return"};}if(mouseX < 200) {
-        fill("green");ellipse(50+65,50+65, 50,70);if(stepping&&++i==returnID) {highlightLine(77);throw {type:"return"};}
-    }
+        randomSeed(2427436);
+        background(0); 
+        fill("white");
+        // if(stepping&&++i>=returnID) {highlightLine(33);throw {type:"return"};}
+        // text(frameCount, 120,20);
+        // let size = random(50);
+        // stroke(0);
+        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(37);throw {type:"return"};}
+        // size = random(50);
+        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(39);throw {type:"return"};}
+        // size = random(50);
+        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(41);throw {type:"return"};}
+        // size = random(50);
+        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(43);throw {type:"return"};}
+        // size = random(50);
+        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(45);throw {type:"return"};}
+        // size = random(50);
+        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(47);throw {type:"return"};}
+        
+        // ellipse(mouseX, mouseY, 50,70);
+        // if(stepping&&++i>=returnID) {highlightLine(50);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+20,50+20, 50,70);if(stepping&&++i>=returnID) {highlightLine(51);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(53);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+25,50+25, 50,70);if(stepping&&++i>=returnID) {highlightLine(54);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(56);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+30,50+30, 50,70);if(stepping&&++i>=returnID) {highlightLine(57);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(59);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+35,50+35, 50,70);if(stepping&&++i>=returnID) {highlightLine(60);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(62);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+40,50+40, 50,70);if(stepping&&++i>=returnID) {highlightLine(63);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(65);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+45,50+45, 50,70);if(stepping&&++i>=returnID) {highlightLine(66);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(68);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+50,50+50, 50,70);if(stepping&&++i>=returnID) {highlightLine(69);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(71);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+55,50+55, 50,70);if(stepping&&++i>=returnID) {highlightLine(72);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(74);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+60,50+60, 50,70);if(stepping&&++i>=returnID) {highlightLine(75);throw {type:"return"};}
+        // }
+        // if(stepping&&++i>=returnID) {highlightLine(77);throw {type:"return"};}if(mouseX < 200) {
+        //     fill("green");ellipse(50+65,50+65, 50,70);if(stepping&&++i>=returnID) {highlightLine(78);throw {type:"return"};}
+        // }
 
+        // if(stepping&&++i>=returnID) {highlightLine(81);throw {type:"return"};}
+        // globalFuncCallStack.push({funcName:"foo",pCounter:i});
+        // foo(200, 100);
+        // i=globalFuncCallStack.pop().pCounter;
+        
 
-    // allFlags["foo"]={};
-    // callerFlags["foo"] = {index:i, flags:flags};
-    // foo();
-    
+        // let d = 90;
+        // if(d > 80) {
+        //     fill("orange");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(89);throw {type:"return"};}
+        //     fill("red");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(90);throw {type:"return"};}
+        //     fill("blue");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(91);throw {type:"return"};}
+        //     fill("cyan");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(92);throw {type:"return"};}
+        // }
+        
+        // var object = dummy[(function(){if(stepping&&++i>=returnID) {highlightLine(95);throw {type:"return"};}})()] = {
+        //     k: "23"+(function(){if(stepping&&++i>=returnID) {highlightLine(96);throw {type:"return"};}})()
+        // }
 
-    // let d = 70;http://192.168.1.101:8088/editor_2.html#
-    // if(d > 80) {
-    //     fill("orange");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(88);throw {type:"return"};}
-    //     fill("red");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(89);throw {type:"return"};}
-    //     fill("blue");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(90);throw {type:"return"};}
-    //     fill("cyan");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(91);throw {type:"return"};}
-    // }
-    // returnID = 9;
-    //http://192.168.1.101:8088/editor_2.html#
-    
-    // for(let n = 0; n < 2; n++) {
-    //     if(stepping&&++i==returnID) {highlightLine(97);throw {type:"return"};}
-    //     fill("cyan");rect(n*15+100, n*15+100, 20,20);if(stepping&&++i==returnID) {highlightLine(98);throw {type:"return"};}
-    // }
-    
-    // var object = dummy[(function(){if(stepping&&++i==returnID) {highlightLine(101);throw {type:"return"};}})()] = {
-    //     k: "23"+(function(){if(stepping&&++i==returnID) {highlightLine(102);throw {type:"return"};}})()
-    // }
-
-    // allFlags["foo"]={};
-    // callerFlags["foo"] = {index:i};
-    // foo();i=callerFlags["foo"].index;if(stepping&&++i==returnID) {highlightLine(107);throw {type:"return"};}
-    
-    // let g = 0;
-    // while(g < 2) {
-    //     if(stepping&&++i==returnID) {highlightLine(111);throw {type:"return"};}
-    //      fill("green");rect(g*15+100, g*15+200, 20,20);if(stepping&&++i==returnID) {highlightLine(112);throw {type:"return"};}
-    //     if(stepping&&++i==returnID) {highlightLine(113);throw {type:"return"};}
-    //     let inf_i=i;
-    //     if(stepping&&++i==returnID) {highlightLine(115);throw {type:"return"};}
-    //     fill("red");rect(g*15+100, g*15+200, 20,20);if(stepping&&++i==returnID) {highlightLine(116);throw {type:"return"};}
-    //     // if(flags[i++]) {i = inf_i;flags={};flags[i]=true;returnID=i+1;highlightLine(117);throw {type:"return"};}
-    //     g++;
-    // }
-    
-    fakeFrameCount++;
-    allFlags["draw"]={};
-    fakeMouseX = tempX;
-    fakeMouseY = tempY;
-    i=-1;
-    returnID = 0;
-    console.log("normal return", returnID, "  i++ ", i+1);
+        // if(stepping&&++i>=returnID) {highlightLine(99);throw {type:"return"};}
+        // globalFuncCallStack.push({funcName:"foo",pCounter:i});
+        // foo(10, 580, 5);
+        // i=globalFuncCallStack.pop().pCounter;
+        
+        
+        // for(let n = 0; n < 2; n++) {
+        //     if(stepping&&++i>=returnID) {highlightLine(106);throw {type:"return"};}
+        //     fill("cyan");rect(n*15+100, n*15+100, 20,20);if(stepping&&++i>=returnID) {highlightLine(107);throw {type:"return"};}
+        // }
+        
+        let g = 0;
+        stroke(0);
+        scale(2);
+        while(true) {
+            let inf_i=i; if(stepping&&++i>=returnID) {highlightLine(114);throw {type:"return"};}
+            fill(85, 141, 232);rect(g*15+75, g*15+105, 150,150);if(stepping&&++i>=returnID) {highlightLine(115);throw {type:"return"};}
+            if(stepping&&++i>=returnID) {highlightLine(116);throw {type:"return"};}
+            if(stepping&&++i>=returnID) {highlightLine(117);throw {type:"return"};}
+            fill(126, 85, 232);rect(g*15+100, g*15+130, 150,150);if(stepping&&++i>=returnID) {highlightLine(118);throw {type:"return"};}
+            if(stepping&&++i>=returnID) {highlightLine(119);throw {type:"return"};}
+            if(stepping&&++i>=returnID) {highlightLine(120);throw {type:"return"};}
+            
+            // if(stepping&&++i>=returnID) {
+            //     highlightLine(123);
+            //     throw {type:"return"};
+            // }
+            i = inf_i;
+            returnIDFloat=i+1;
+            
+            break;
+        }
+        
+        fakeFrameCount++;
+        fakeMouseX = tempX;
+        fakeMouseY = tempY;
+        if(infiniteLoopPresent) {
+            returnID = Math.trunc(returnIDFloat);
+        } else {
+            returnID = 0;
+            returnIDFloat = 0;
+        }
+        console.log("normal return", returnID, "  i++ ", i+1);
     }catch(e) {
         if(e.type && e.type == "return") {
-            console.log("special return", returnID, "  i++ ", i);
+            // console.log("special return", returnID, "  i++ ", i);
+            returnID = Math.trunc(returnIDFloat);
         } else {
             throw e;
         }
@@ -564,18 +602,27 @@ function draw() {
     mouseY = tempY;
     // console.log("H");
 }
-
-
     
-function foo() {
-    let i = callerFlags["foo"].index;
-    fill("yellow");rect( 80, 80, 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(144);throw {type:"return"};}
-    fill("yellow");rect( 80+20, 80, 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(145);throw {type:"return"};}
-    fill("yellow");rect( 80+30, 80, 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(146);throw {type:"return"};}
-    fill("yellow");rect( 80+4, 80, 20+random(20), 30+random(50));if(stepping&&++i==returnID) {highlightLine(147);throw {type:"return"};}
-    callerFlags["foo"].index = i;
+function foo(x,w,recurseNum) {
+    let frame = globalFuncCallStack[globalFuncCallStack.length-1];
+    console.assert(frame.funcName=="foo");
+    let i = frame.pCounter;
+    let randDiff = random(5);
+    x = width - w;
+    fill(255,255,0, 10);
+    strokeWeight(4);
+    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(163);throw {type:"return"};}
+    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(164);throw {type:"return"};}
+    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(165);throw {type:"return"};}
+    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(166);throw {type:"return"};}
+    if(recurseNum && recurseNum > 0) {
+        if(stepping&&++i>=returnID) {highlightLine(168);throw {type:"return"};}
+        globalFuncCallStack.push({funcName:"foo",pCounter:i});
+        foo(x+4*w/5, 4*w/5, recurseNum-1);
+        i=globalFuncCallStack.pop().pCounter;
+    }
+    frame.pCounter = i;
 }
-
 
 
 
