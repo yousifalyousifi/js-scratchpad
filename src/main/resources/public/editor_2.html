@@ -181,7 +181,6 @@ editor.commands.addCommand({
             console.log("processing.")
             window.localStorage.setItem("code", editor.getValue());
             undecoratedCode = editor.getValue();
-            // process(editor.getValue());
         } catch(e) {
             console.error(e);
         }
@@ -194,169 +193,236 @@ window.pp = function() {
     console.log.apply(null, arguments);
 };
 
-editor.container.addEventListener('click', function(e) {
-  // pp("CLICK");
-  // e.preventDefault();
-  // monokai();
-  // editor.selection.toSingleRange();
-  // editor.selection.clearSelection();
-  // forfeitHighlightControl = false;
-  // return false;
-}, false);
-
-highlightableSections = {};
-id = 0;
 forfeitHighlightControl = false;
 stepping = false;
+returnID = 0;
+globalFuncCallStack = [];
+GLOBAL_INDEX = 0;
+fakeFrameCount = 0;
+fakeMouseX = 0;
+fakeMouseY = 0;
+dummy = {};
+returnIDFloat = 0;
+infiniteLoopPresent = false;
 
-function process(code) {
+//stepping
+autostep = 1;
+autoplay = null;
+autointerval = 300;
+
+//jumping
+forceMultiJump = 0;
+allowJump = false;
+
+
+isViewingDecoratedCode = false;
+decoratedCode = "";
+undecoratedCode = "";
+
+function process() {
+    
     let tokens = [];
-    let ast = acorn.parse(code, {
-        // collect ranges for each node
+    let lines = getLines(editor.getValue());
+    let postfix = " Decoration";
+    
+    let ast = acorn.parse(editor.getValue(), {
         ranges: true,
         locations: true,
-        // collect token ranges
         onToken: tokens
     });
+    
+    nodes = [];
+    
+    acorn.walk.ancestor(ast, acorn.walkall.makeVisitors(function(node, ancestors) {
+        // console.log("");
+        // console.log("Found node type", node.type);
+        node.ancestors = [];
+        for(let a of ancestors) {
+            node.ancestors.push(a);
+        }
+        if(node.type == "ExpressionStatement") {
+            processExp(node);
+        }
+        if(node.type == "VariableDeclaration") {
+            processingVarDecl(node);
+        }
+        if(node.type == "BlockStatement") {
+            let parent = node.ancestors[node.ancestors.length-2];
+            if(parent.type == "ForInStatement" 
+            || parent.type == "ForStatement"
+            || parent.type == "ForOfStatement"
+            || parent.type == "ForStatement"
+            || parent.type == "WhileStatement"
+            || parent.type == "FunctionDeclaration"
+            || parent.type == "FunctionExpression") {
+                processingBlockInside(node, "BLOCK");
+            }
+            
+        }
+        if(node.type =="IfStatement") {
+                processingInsertBefore(node, "BLOCK");
+            }
+        if(node.type == "ForInStatement" 
+            || node.type == "ForStatement"
+            || node.type == "ForOfStatement"
+            || node.type == "ForStatement"
+            || node.type == "WhileStatement"
+            || node.type == "FunctionDeclaration"
+            || node.type == "FunctionExpression") {
+            }
+        // console.log(node);
+        // console.log(ancestors);
+        nodes.push(node);
+    }), acorn.walkall.traversers);
+    
+    
+    function processExp(exp) {
+        processingInsertBefore(exp, "EXPRESSION");
+    }
+    
+    function processingVarDecl(n) {
+        processingInsertBefore(n, "VAR");
+    }
+    
+    function processingBlockInside(node, label) {
+        label = label || "UNLABELLED";
+        let lineIndex = node.loc.start.line-1;
+        lines[lineIndex] = lines[lineIndex].replace("pp('hi');/**"+label+" DECL"+postfix+"**/", "");
+        
+        let columnIndex = node.loc.start.column;
+        
+        let lineString = lines[lineIndex]; 
+        let decoratedLine = lineString.slice(0, columnIndex+1) + "pp('hi');/**"+label+" DECL"+postfix+"**/" + lineString.slice(columnIndex+1); 
+        lines[lineIndex] = decoratedLine;
+    }
+    
+    function processingBlockOutside(node, label) {
+        label = label || "UNLABELLED";
+        let lineIndex = node.loc.start.line-1;
+        lines[lineIndex] = lines[lineIndex].replace("pp('hi');/**"+label+" DECL"+postfix+"**/", "");
+        
+        let columnIndex = node.loc.start.column;
+        
+        let lineString = lines[lineIndex]; 
+        let decoratedLine = lineString.slice(0, columnIndex) + "pp('hi');/**"+label+" DECL"+postfix+"**/" + lineString.slice(columnIndex); 
+        lines[lineIndex] = decoratedLine;
+    }
+    
+    function processingInsertBefore(node, label) {
+        label = label || "UNLABELLED";
+        let lineIndex = node.loc.start.line-1;
+        lines[lineIndex] = lines[lineIndex].replace("pp('hi');/**"+label+" DECL"+postfix+"**/", "");
+        
+        let columnIndex = node.loc.start.column;
+        
+        let lineString = lines[lineIndex]; 
+        let decoratedLine = lineString.slice(0, columnIndex) + "pp('hi');/**"+label+" DECL"+postfix+"**/" + lineString.slice(columnIndex); 
+        lines[lineIndex] = decoratedLine;
+    }
+    
+    decoratedCode = lines.join('\n');
 
-    // acorn.walk.simple(ast, {
-    //   Literal(node) {
-    //     console.log(`Found a literal: ${node.value}`)
-    //     console.log(node)
-    //   },
-    //   FunctionDeclaration(node) {
-    //     highlightLine(node.loc.start.line);
-    //     console.log(`Found a function: ${node.id.name}`)
-    //     console.log(node)
-    //   }
-    // });
-    let id = 0;
-    highlightableSections = {};
-    // acorn.walk.simple(ast, acorn.walkall.makeVisitors(function(node) {
-    //       console.log('Found node type', node.type);
-    //       highlightableSections[++id] = node;
-    //       console.log(id);
-    //       console.log(node);
-    //     }), acorn.walkall.traversers);
-
-    // acorn.walk.ancestor(ast, acorn.walkall.makeVisitors(function(node, ancestors) {
-    //     // console.log("");
-    //     // console.log('Found node type', node.type);
-    //     // console.log(node);
-    //     if(node.type == "CallExpression") {
-    //         if(node.callee.name=="highlightLine") {
-    //             highlightableSections[id++] = node;
-    //         }
-    //     }
-    //     let anc = ancestors.slice(0);
-    //     anc.reverse();
-    //     // for(let a of anc) {
-    //     //     console.log(id);
-    //     //     console.log(a);
-    //     //     highlightableSections[++id] = a;
-    //     // }
-    // }), acorn.walkall.traversers);
-
-    // console.log("");
-    // console.log("highlightableSections", highlightableSections);
-    // console.log("highlightableSections.size", Object.keys(highlightableSections).length);
-
+    return nodes;
 }
 
-    returnID = 0;
-    $("#b0").click(function(){
-        if(stepping == true) {
-            // returnID++;
-            window.returnIDFloat -= 1;
-            if(window.returnIDFloat<0) window.returnIDFloat = 0;
+$("#b0").click(function(){
+    if(stepping == true) {
+        // returnID++;
+        returnIDFloat -= 1;
+        if(returnIDFloat<0) returnIDFloat = 0;
+    }
+    forfeitHighlightControl = true;
+    pp("returnId", returnID);
+    stepping = true;
+});
+
+$("#b1").click(function(){
+    if(stepping == true) {
+        // returnID++;
+        if(allowJump) {
+            returnIDFloat += forceMultiJump;
+            allowJump = false;
+        } else {
+
+        returnIDFloat += 1;
         }
-        forfeitHighlightControl = true;
-        pp("returnId", returnID);
-        stepping = true;
-    });
-    $("#b1").click(function(){
-        if(stepping == true) {
-            // returnID++;
-            if(window.allowJump) {
-                window.returnIDFloat += window.forceMultiJump;
-                window.allowJump = false;
-            } else {
+    }
+    forfeitHighlightControl = true;
+    pp("returnId", returnID);
+    stepping = true;
+});
 
-            window.returnIDFloat += 1;
-            }
+$("#b2").click(function(){
+    forfeitHighlightControl = false;
+    stepping = false;
+    returnID=0;
+    if(autoplay) clearInterval(autoplay);
+});
+
+$("#b3").click(function(){
+    let code = editor.getValue();
+    let lines = code.split("\n");
+    let newcode = [];
+    for(let l = 0; l < lines.length; l++) {
+        let line = lines[l];
+        let newline = line.replace(/highlightLine\(\d*\)/g , "highlightLine("+(l+1)+")");
+        newcode.push(newline);
+    }
+    let nc = newcode.join("\n");
+    editor.setValue(nc);
+});
+
+
+$("#b4").click(function(){//start the automated i-changing via shared memory
+    returnID=0;
+    forfeitHighlightControl = true;
+    stepping = true;
+    pp("auto starting");
+
+    allowJump = true;
+
+    if(autoplay) clearInterval(autoplay);
+    autoplay = setInterval(function() {
+        // pp("auto returnId", returnID, returnID+1);
+        // returnID++;
+        if(allowJump) {
+            returnIDFloat += forceMultiJump;
+            allowJump = false;
+        } else {
+            returnIDFloat += autostep||1;
         }
-        forfeitHighlightControl = true;
-        pp("returnId", returnID);
-        stepping = true;
-    });
-    $("#b2").click(function(){
-        forfeitHighlightControl = false;
-        stepping = false;
-        returnID=0;
-        if(window.autoplay) clearInterval(window.autoplay);
-    });
-    $("#b3").click(function(){
-        let code = editor.getValue();
-        let lines = code.split("\n");
-        let newcode = [];
-        for(let l = 0; l < lines.length; l++) {
-            let line = lines[l];
-            let newline = line.replace(/highlightLine\(\d*\)/g , "highlightLine("+(l+1)+")");
-            newcode.push(newline);
-        }
-        let nc = newcode.join("\n");
-        editor.setValue(nc);
-    });
+    },autointerval||300);
+});
 
-    $("#b4").click(function(){//start the automated i-changing via shared memory
-        returnID=0;
-        forfeitHighlightControl = true;
-        stepping = true;
-        pp("auto starting");
-        let size = Object.keys(highlightableSections).length;
-        console.log("highlightableSections.size", Object.keys(highlightableSections).length);
+$("#b5").click(function(){//start the automated i-changing via shared memory
+    forfeitHighlightControl = false;
+    stepping = false;
+    if(autoplay) clearInterval(autoplay);
+});
 
-        window.allowJump = true;
+$("#b6").click(function(){
+    editor.setValue(undecoratedCode);
+    // let code = editor.getValue();
+    // if(isViewingDecoratedCode) {
+    //     console.log("undecorating");
+    //     decoratedCode = code;
+    //     isViewingDecoratedCode = false;
+    //     editor.setValue(undecoratedCode);
+    // } else {
+    //     console.log("decorating");
+    //     undecoratedCode = code;
+        
+    //     //create decorated code
 
-        if(window.autoplay) clearInterval(window.autoplay);
-        window.autoplay = setInterval(function() {
-            // pp("auto returnId", returnID, returnID+1);
-            // returnID++;
-            if(window.allowJump) {
-                window.returnIDFloat += window.forceMultiJump;
-                window.allowJump = false;
-            } else {
-                window.returnIDFloat += window.autostep||1;
-            }
-        },window.autointerval||300);
-    });
-    $("#b5").click(function(){//start the automated i-changing via shared memory
-        forfeitHighlightControl = false;
-        stepping = false;
-        if(window.autoplay) clearInterval(window.autoplay);
-    });
+    //     editor.setValue(decoratedCode);
+    //     isViewingDecoratedCode = true;
+    // }
+});
 
-    isViewingDecoratedCode = false;
-    decoratedCode = "";
-    undecoratedCode = "";
-    $("#b6").click(function(){
-        editor.setValue(undecoratedCode);
-        // let code = editor.getValue();
-        // if(isViewingDecoratedCode) {
-        //     console.log("undecorating");
-        //     decoratedCode = code;
-        //     isViewingDecoratedCode = false;
-        //     editor.setValue(undecoratedCode);
-        // } else {
-        //     console.log("decorating");
-        //     undecoratedCode = code;
-            
-        //     //create decorated code
-
-        //     editor.setValue(decoratedCode);
-        //     isViewingDecoratedCode = true;
-        // }
-    });
+$("#b7").click(function(){
+    undecoratedCode = editor.getValue();
+    editor.setValue(decoratedCode);
+});
 
 function getLines(code) {
     let result = [];
@@ -375,19 +441,6 @@ function highlightLine(lineNumber) {
         // debugmonokai();
         // pp(l);
     }
-}
-function highlightSection(sectionId) {
-    node = highlightableSections[sectionId];
-    console.log("");
-    console.log(sectionId);
-    console.log(node);
-    editor.selection.setRange(new Range(
-        node.loc.start.line-1,
-        node.loc.start.column,
-        node.loc.end.line-1,
-        node.loc.end.column
-        ));
-    debugmonokai();
 }
 
         </script>
