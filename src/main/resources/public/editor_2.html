@@ -81,8 +81,11 @@
                         </div>
                     </li>
 
+                    <li id="b0" class="nav-item">
+                        <a class="nav-link" href="#">back step</a>
+                    </li>
                     <li id="b1" class="nav-item">
-                        <a class="nav-link" href="#">start stepping</a>
+                        <a class="nav-link" href="#">forward step</a>
                     </li>
                     <li id="b2" class="nav-item">
                         <a class="nav-link" href="#">stop stepping</a>
@@ -97,7 +100,7 @@
                         <a class="nav-link" href="#">stop auto step</a>
                     </li>
                     <li id="b6" class="nav-item">
-                        <a class="nav-link" href="#">toggle code</a>
+                        <a class="nav-link" href="#">restore code</a>
                     </li>
                     <li id="b7" class="nav-item">
                         <a class="nav-link" href="#">B7</a>
@@ -177,7 +180,8 @@ editor.commands.addCommand({
         try {
             console.log("processing.")
             window.localStorage.setItem("code", editor.getValue());
-            process(editor.getValue());
+            undecoratedCode = editor.getValue();
+            // process(editor.getValue());
         } catch(e) {
             console.error(e);
         }
@@ -200,8 +204,6 @@ editor.container.addEventListener('click', function(e) {
   // return false;
 }, false);
 
-
-hooks = {};
 highlightableSections = {};
 id = 0;
 forfeitHighlightControl = false;
@@ -237,35 +239,51 @@ function process(code) {
     //       console.log(node);
     //     }), acorn.walkall.traversers);
 
-    acorn.walk.ancestor(ast, acorn.walkall.makeVisitors(function(node, ancestors) {
-        console.log("");
-        console.log('Found node type', node.type);
-        console.log(node);
-        if(node.type == "CallExpression") {
-            if(node.callee.name=="highlightLine") {
-                highlightableSections[id++] = node;
-            }
-        }
-        let anc = ancestors.slice(0);
-        anc.reverse();
-        // for(let a of anc) {
-        //     console.log(id);
-        //     console.log(a);
-        //     highlightableSections[++id] = a;
-        // }
-    }), acorn.walkall.traversers);
+    // acorn.walk.ancestor(ast, acorn.walkall.makeVisitors(function(node, ancestors) {
+    //     // console.log("");
+    //     // console.log('Found node type', node.type);
+    //     // console.log(node);
+    //     if(node.type == "CallExpression") {
+    //         if(node.callee.name=="highlightLine") {
+    //             highlightableSections[id++] = node;
+    //         }
+    //     }
+    //     let anc = ancestors.slice(0);
+    //     anc.reverse();
+    //     // for(let a of anc) {
+    //     //     console.log(id);
+    //     //     console.log(a);
+    //     //     highlightableSections[++id] = a;
+    //     // }
+    // }), acorn.walkall.traversers);
 
-    console.log("");
-    console.log("highlightableSections", highlightableSections);
-    console.log("highlightableSections.size", Object.keys(highlightableSections).length);
+    // console.log("");
+    // console.log("highlightableSections", highlightableSections);
+    // console.log("highlightableSections.size", Object.keys(highlightableSections).length);
 
 }
 
     returnID = 0;
+    $("#b0").click(function(){
+        if(stepping == true) {
+            // returnID++;
+            window.returnIDFloat -= 1;
+            if(window.returnIDFloat<0) window.returnIDFloat = 0;
+        }
+        forfeitHighlightControl = true;
+        pp("returnId", returnID);
+        stepping = true;
+    });
     $("#b1").click(function(){
         if(stepping == true) {
             // returnID++;
+            if(window.allowJump) {
+                window.returnIDFloat += window.forceMultiJump;
+                window.allowJump = false;
+            } else {
+
             window.returnIDFloat += 1;
+            }
         }
         forfeitHighlightControl = true;
         pp("returnId", returnID);
@@ -298,12 +316,19 @@ function process(code) {
         let size = Object.keys(highlightableSections).length;
         console.log("highlightableSections.size", Object.keys(highlightableSections).length);
 
+        window.allowJump = true;
+
         if(window.autoplay) clearInterval(window.autoplay);
         window.autoplay = setInterval(function() {
             // pp("auto returnId", returnID, returnID+1);
             // returnID++;
-            window.returnIDFloat += window.autostep||0.1;
-        },window.autointerval||1);
+            if(window.allowJump) {
+                window.returnIDFloat += window.forceMultiJump;
+                window.allowJump = false;
+            } else {
+                window.returnIDFloat += window.autostep||1;
+            }
+        },window.autointerval||300);
     });
     $("#b5").click(function(){//start the automated i-changing via shared memory
         forfeitHighlightControl = false;
@@ -315,22 +340,22 @@ function process(code) {
     decoratedCode = "";
     undecoratedCode = "";
     $("#b6").click(function(){
-        console.log("toggling");
-        let code = editor.getValue();
-        if(isViewingDecoratedCode) {
-
-            isViewingDecoratedCode = false;
-            editor.setValue(undecoratedCode);
-        } else {
-            undecoratedCode = code;
+        editor.setValue(undecoratedCode);
+        // let code = editor.getValue();
+        // if(isViewingDecoratedCode) {
+        //     console.log("undecorating");
+        //     decoratedCode = code;
+        //     isViewingDecoratedCode = false;
+        //     editor.setValue(undecoratedCode);
+        // } else {
+        //     console.log("decorating");
+        //     undecoratedCode = code;
             
-            //create decorated code
+        //     //create decorated code
 
-            
-
-            //editor.setValue(decoratedCode);
-            isViewingDecoratedCode = true;
-        }
+        //     editor.setValue(decoratedCode);
+        //     isViewingDecoratedCode = true;
+        // }
     });
 
 function getLines(code) {
@@ -340,11 +365,6 @@ function getLines(code) {
         result.push(s);
     }
     return result;
-}
-
-function insertHook(codeToEdit, line, column, id) {
-
-    return codeToEdit;
 }
 
 function highlightLine(lineNumber) {
@@ -370,51 +390,6 @@ function highlightSection(sectionId) {
     debugmonokai();
 }
 
-function animateSections() {
-    function animator() {
-        id = 0;
-        return function() {
-            console.log(++id);
-            if(highlightableSections[id] == undefined) {
-                console.log("stopping");
-                clearInterval(window.handle);
-            } else {
-                highlightSection(id);
-            }
-        };
-    }
-    window.handle = setInterval(animator(), 200);
-
-    // setTimeout(function() {
-    //             clearInterval(window.handle);
-    // }, 5000);
-}
-
-function currentnode() {
-    console.log(id);
-    console.log(highlightableSections[id]);
-}
-
-
-function createWebWorker(code) {
-    // URL.createObjectURL
-    window.URL = window.URL || window.webkitURL;
-
-    // "Server response", used in all examples
-    var response = code;
-
-    var blob;
-    try {
-        blob = new Blob([response], {type: 'application/javascript'});
-    } catch (e) { // Backwards-compatibility
-        window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-        blob = new BlobBuilder();
-        blob.append(response);
-        blob = blob.getBlob();
-    }
-    return new Worker(URL.createObjectURL(blob));
-
-}
         </script>
         <div class="modal fade" id="myModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
