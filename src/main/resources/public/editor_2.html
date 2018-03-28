@@ -90,9 +90,6 @@
                     <li id="b2" class="nav-item">
                         <a class="nav-link" href="#">stop stepping</a>
                     </li>
-                    <li id="b3" class="nav-item">
-                        <a class="nav-link" href="#">fill line numbers</a>
-                    </li>
                     <li id="b4" class="nav-item">
                         <a class="nav-link" href="#">start auto step</a>
                     </li>
@@ -210,11 +207,6 @@ autostep = 1;
 autoplay = null;
 autointerval = 300;
 
-//jumping
-forceMultiJump = 0;
-allowJump = false;
-
-
 isViewingDecoratedCode = false;
 decoratedCode = "";
 undecoratedCode = "";
@@ -222,7 +214,6 @@ undecoratedCode = "";
 function process() {
     
     let tokens = [];
-    let lines = getLines(editor.getValue());
     let postfix = " Decoration";
     let markers = [];
     let funcCallMarkers = [];
@@ -252,7 +243,7 @@ function process() {
         if(node.type == _FunctionDeclaration 
             && node.id.name == "draw") {
             let blockNode = node.body;
-            processWrapMainFunctionBody(blockNode, lines);
+            processWrapMainFunctionBody(blockNode);
         }
 
 		//wrap function bodies that are not draw nor setup
@@ -265,7 +256,7 @@ function process() {
 				return; //skip
 			}
 			let blockNode = node.body;
-			processWrapNonMainFunctionBody(blockNode, lines);
+			processWrapNonMainFunctionBody(blockNode);
 		}
 
         if(node.type == _IfStatement
@@ -367,25 +358,26 @@ function process() {
     }
 
     function processInsertAfterStatement(node) {
-        let lineIndex = node.loc.end.line-1;
-        let lineNumber = lineIndex+1;
+        let lineNumber = node.loc.end.line;
         insertAtPos("BREAKPOINT("+lineNumber+");", node.range[1]);
     }
 
     function processBeforeStatementNode(node) {
-        let lineIndex = node.loc.start.line-1;
-        let columnIndex = node.loc.start.column;
-        let lineNumber = lineIndex+1;
+        let lineNumber = node.loc.start.line;
         insertAtPos("BREAKPOINT("+lineNumber+");", node.range[0]);
     }
 
     function processNodesWithTests(node) {
-        let parent = node.ancestors[node.ancestors.length-2];
-        let lineIndex = node.loc.start.line-1;
         node = node.test;
-        let lineNumber = lineIndex+1;
+        let lineNumber = node.loc.start.line;
         insertAtPos("BREAKPOINT("+lineNumber+")||", node.range[0]);
 
+    }
+
+    function processWrapNonMainFunctionBody(node) {
+        let lineNumber = node.loc.start.line;
+       	insertAtPos("BREAKPOINT("+lineNumber+");", node.range[0]+1);
+       	//insertAtPos("END();", node.range[1]-1);
     }
 
     function processWrapMainFunctionBody(node) {
@@ -470,41 +462,27 @@ function process() {
 	}
 
     decoratedCode = code;
-    //decoratedCode = lines.join('\n');
 
     return nodes;
 }
 
-
 $("#b0").click(function(){
     if(stepping == true) {
-        // returnID++;
         returnIDFloat -= 1;
         if(returnIDFloat<0) returnIDFloat = 0;
     }
     forfeitHighlightControl = true;
-    pp("returnId", returnID);
     stepping = true;
+    debugmonokai();
 });
 
 $("#b1").click(function(){
-    pp("stepping", stepping);
     if(stepping == true) {
-        // returnID++;
-        pp("allowJump", allowJump);
-        if(allowJump) {
-            returnIDFloat += forceMultiJump;
-            allowJump = false;
-        } else {
-            pp("before returnId", returnID);
-            pp("before returnIDFloat", returnIDFloat);
-            returnIDFloat += 1;
-        }
+        returnIDFloat += 1;
     }
     forfeitHighlightControl = true;
-    pp("returnId", returnID);
-    pp("returnIDFloat", returnIDFloat);
     stepping = true;
+    debugmonokai();
 });
 
 $("#b2").click(function(){
@@ -513,47 +491,25 @@ $("#b2").click(function(){
     returnID=0;
     returnIDFloat=0;
     if(autoplay) clearInterval(autoplay);
+    monokai();
 });
-
-$("#b3").click(function(){
-    let code = editor.getValue();
-    let lines = code.split("\n");
-    let newcode = [];
-    for(let l = 0; l < lines.length; l++) {
-        let line = lines[l];
-        let newline = line.replace(/BREAKPOINT\(\d*\)/g , "BREAKPOINT("+(l+1)+")");
-        newcode.push(newline);
-    }
-    let nc = newcode.join("\n");
-    editor.setValue(nc);
-});
-
 
 $("#b4").click(function(){
     returnID=0;
     forfeitHighlightControl = true;
     stepping = true;
-    pp("auto starting");
-
-    allowJump = true;
-
     if(autoplay) clearInterval(autoplay);
     autoplay = setInterval(function() {
-        // pp("auto returnId", returnID, returnID+1);
-        // returnID++;
-        if(allowJump) {
-            returnIDFloat += forceMultiJump;
-            allowJump = false;
-        } else {
-            returnIDFloat += autostep||1;
-        }
+        returnIDFloat += autostep||1;
     },autointerval||300);
+    debugmonokai();
 });
 
 $("#b5").click(function(){
     forfeitHighlightControl = false;
     stepping = false;
     if(autoplay) clearInterval(autoplay);
+    monokai();
 });
 
 $("#b6").click(function(){
@@ -566,25 +522,11 @@ $("#b7").click(function(){
     editor.setValue(decoratedCode);
 });
 
-function getLines(code) {
-    let result = [];
-    let a = code.split('\n');
-    for (let s of a) {
-        result.push(s);
-    }
-    return result;
-}
-
 function highlightLine(lineNumber) {
     if(forfeitHighlightControl) {
         let l = lineNumber-1;
         editor.selection.setRange(new Range(l, 10000, l, 0));
     }
-}
-
-//provides a BREAKPOINT function to override the global BREAKPOINT one.
-function getBreakPointOverride() {
-	return 'function BREAKPOINT(lineNumber) {if(stepping&&++LOCAL_INDEX>=returnID) {highlightLine(lineNumber);throw {type:"return"};}}';
 }
 
 function BREAKPOINT(lineNumber) {
@@ -606,10 +548,9 @@ function InsertionMarkerSorter(a, b) {
 	}
 }
 
-
-//______________________________________
-//_https://stackoverflow.com/a/14853974_
-//______________________________________
+//____________________________________
+//https://stackoverflow.com/a/14853974
+//____________________________________
 // Warn if overriding existing method
 if(Array.prototype.equals)
     console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
@@ -700,6 +641,7 @@ const _VariableDeclarator = "VariableDeclarator"
 const _WhileStatement = "WhileStatement"
 const _WithStatement = "WithStatement"
 const _Property = "Property"
+
         </script>
         <div class="modal fade" id="myModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -732,225 +674,5 @@ const _Property = "Property"
                 </div>
             </div>
         </div>
-
-        <pre id="defaultCode" style="display:none;">
-var p = 0.;
-var g = new p5.Gen();
-var speed = 0.01;
-
-function setup()
-{
-    createCanvas(600, 600);
-}
-
-callerFlags = {};
-globalFuncCallStack = [];
-var i =0;
-fakeFrameCount = 0;
-fakeMouseX = 0;
-fakeMouseY = 0;
-
-var dummy = {};
-
-returnIDFloat = 0;
-infiniteLoopPresent = true;
-
-function draw() {
-    i =-1;
-    frameCount = fakeFrameCount;
-    let tempX = mouseX;
-    let tempY = mouseY;
-    mouseX = fakeMouseX;
-    mouseY = fakeMouseY;
-    try{
-        randomSeed(2427436);
-        background(0); 
-        fill("white");
-        // if(stepping&&++i>=returnID) {highlightLine(33);throw {type:"return"};}
-        // text(frameCount, 120,20);
-        // let size = random(50);
-        // stroke(0);
-        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(37);throw {type:"return"};}
-        // size = random(50);
-        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(39);throw {type:"return"};}
-        // size = random(50);
-        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(41);throw {type:"return"};}
-        // size = random(50);
-        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(43);throw {type:"return"};}
-        // size = random(50);
-        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(45);throw {type:"return"};}
-        // size = random(50);
-        // ellipse(random(width),      random(height), 30+size, 30+size);if(stepping&&++i>=returnID) {highlightLine(47);throw {type:"return"};}
-        
-        // ellipse(mouseX, mouseY, 50,70);
-        // if(stepping&&++i>=returnID) {highlightLine(50);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+20,50+20, 50,70);if(stepping&&++i>=returnID) {highlightLine(51);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(53);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+25,50+25, 50,70);if(stepping&&++i>=returnID) {highlightLine(54);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(56);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+30,50+30, 50,70);if(stepping&&++i>=returnID) {highlightLine(57);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(59);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+35,50+35, 50,70);if(stepping&&++i>=returnID) {highlightLine(60);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(62);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+40,50+40, 50,70);if(stepping&&++i>=returnID) {highlightLine(63);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(65);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+45,50+45, 50,70);if(stepping&&++i>=returnID) {highlightLine(66);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(68);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+50,50+50, 50,70);if(stepping&&++i>=returnID) {highlightLine(69);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(71);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+55,50+55, 50,70);if(stepping&&++i>=returnID) {highlightLine(72);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(74);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+60,50+60, 50,70);if(stepping&&++i>=returnID) {highlightLine(75);throw {type:"return"};}
-        // }
-        // if(stepping&&++i>=returnID) {highlightLine(77);throw {type:"return"};}if(mouseX < 200) {
-        //     fill("green");ellipse(50+65,50+65, 50,70);if(stepping&&++i>=returnID) {highlightLine(78);throw {type:"return"};}
-        // }
-
-        // if(stepping&&++i>=returnID) {highlightLine(81);throw {type:"return"};}
-        // globalFuncCallStack.push({funcName:"foo",pCounter:i});
-        // foo(200, 100);
-        // i=globalFuncCallStack.pop().pCounter;
-        
-
-        // let d = 90;
-        // if(d > 80) {
-        //     fill("orange");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(89);throw {type:"return"};}
-        //     fill("red");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(90);throw {type:"return"};}
-        //     fill("blue");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(91);throw {type:"return"};}
-        //     fill("cyan");rect(random(width), random(height), 20+random(20), 30+random(50));if(stepping&&++i>=returnID) {highlightLine(92);throw {type:"return"};}
-        // }
-        
-        // var object = dummy[(function(){if(stepping&&++i>=returnID) {highlightLine(95);throw {type:"return"};}})()] = {
-        //     k: "23"+(function(){if(stepping&&++i>=returnID) {highlightLine(96);throw {type:"return"};}})()
-        // }
-
-        // if(stepping&&++i>=returnID) {highlightLine(99);throw {type:"return"};}
-        // globalFuncCallStack.push({funcName:"foo",pCounter:i});
-        // foo(10, 580, 5);
-        // i=globalFuncCallStack.pop().pCounter;
-        
-        
-        // for(let n = 0; n < 2; n++) {
-        //     if(stepping&&++i>=returnID) {highlightLine(106);throw {type:"return"};}
-        //     fill("cyan");rect(n*15+100, n*15+100, 20,20);if(stepping&&++i>=returnID) {highlightLine(107);throw {type:"return"};}
-        // }
-        
-        let g = 0;
-        stroke(0);
-        scale(2);
-        while(true) {
-            let inf_i=i; if(stepping&&++i>=returnID) {highlightLine(114);throw {type:"return"};}
-            fill(85, 141, 232);rect(g*15+75, g*15+105, 150,150);if(stepping&&++i>=returnID) {highlightLine(115);throw {type:"return"};}
-            if(stepping&&++i>=returnID) {highlightLine(116);throw {type:"return"};}
-            if(stepping&&++i>=returnID) {highlightLine(117);throw {type:"return"};}
-            fill(126, 85, 232);rect(g*15+100, g*15+130, 150,150);if(stepping&&++i>=returnID) {highlightLine(118);throw {type:"return"};}
-            if(stepping&&++i>=returnID) {highlightLine(119);throw {type:"return"};}
-            if(stepping&&++i>=returnID) {highlightLine(120);throw {type:"return"};}
-            
-            // if(stepping&&++i>=returnID) {
-            //     highlightLine(123);
-            //     throw {type:"return"};
-            // }
-            i = inf_i;
-            returnIDFloat=i+1;
-            
-            break;
-        }
-        
-        fakeFrameCount++;
-        fakeMouseX = tempX;
-        fakeMouseY = tempY;
-        if(infiniteLoopPresent) {
-            returnID = Math.trunc(returnIDFloat);
-        } else {
-            returnID = 0;
-            returnIDFloat = 0;
-        }
-        console.log("normal return", returnID, "  i++ ", i+1);
-    }catch(e) {
-        if(e.type && e.type == "return") {
-            // console.log("special return", returnID, "  i++ ", i);
-            returnID = Math.trunc(returnIDFloat);
-        } else {
-            throw e;
-        }
-    }
-    mouseX = tempX;
-    mouseY = tempY;
-    // console.log("H");
-}
-    
-function foo(x,w,recurseNum) {
-    let frame = globalFuncCallStack[globalFuncCallStack.length-1];
-    console.assert(frame.funcName=="foo");
-    let i = frame.pCounter;
-    let randDiff = random(5);
-    x = width - w;
-    fill(255,255,0, 10);
-    strokeWeight(4);
-    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(163);throw {type:"return"};}
-    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(164);throw {type:"return"};}
-    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(165);throw {type:"return"};}
-    stroke("yellow");rect( x+random(20), 20+random(25), w-40, 80+random(25));if(stepping&&++i>=returnID) {highlightLine(166);throw {type:"return"};}
-    if(recurseNum && recurseNum > 0) {
-        if(stepping&&++i>=returnID) {highlightLine(168);throw {type:"return"};}
-        globalFuncCallStack.push({funcName:"foo",pCounter:i});
-        foo(x+4*w/5, 4*w/5, recurseNum-1);
-        i=globalFuncCallStack.pop().pCounter;
-    }
-    frame.pCounter = i;
-}
-
-
-
-0
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-        </pre>
     </body>
 </html>
