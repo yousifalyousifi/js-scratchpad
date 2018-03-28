@@ -6,7 +6,7 @@ function DrawRunner(divId) {
 		'<pre>'+
 		'<span>Canvas</span>' +
 		'<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>' +
-		'<div id="' + divId + '"/>'+
+		'<div style="position: relative;"><div id="' + divId + '"/></div>'+ //this double wrapped div fixes p5.dom element positioning (kind of)
 		'</pre>';
         $("#p5RefButton").show();
     	$("#displayContainer").html(drawHTML);
