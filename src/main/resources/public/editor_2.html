@@ -102,6 +102,28 @@
                     <li id="b7" class="nav-item">
                         <a class="nav-link" href="#">B7</a>
                     </li>
+
+                    <li id="b20" class="nav-item">
+                        <a class="nav-link" href="#">Run Step Mode</a>
+                    </li>
+                    <li id="b21" class="nav-item">
+                        <a class="nav-link" href="#">Stop Step Mode</a>
+                    </li>
+                    <li id="b22" class="nav-item">
+                        <a class="nav-link" href="#">Step Forward</a>
+                    </li>
+                    <li id="b23" class="nav-item">
+                        <a class="nav-link" href="#">Step Backward</a>
+                    </li>
+                    <li id="b24" class="nav-item">
+                        <a class="nav-link" href="#">Start Autostep</a>
+                    </li>
+                    <li id="b25" class="nav-item">
+                        <a class="nav-link" href="#">Stop Autostep</a>
+                    </li>
+                    <li id="b26" class="nav-item">
+                        <a class="nav-link" href="#">Toggle Step Code</a>
+                    </li>
                 </ul>
             </div>
         </nav>
@@ -466,6 +488,44 @@ function process() {
     return nodes;
 }
 
+function activateStepMode() {
+    forfeitHighlightControl = true;
+    stepping = true;
+    debugmonokai();
+}
+function deactivateStepMode() {
+    forfeitHighlightControl = false;
+    stepping = false;
+    returnID=0;
+    returnIDFloat=0;
+    if(autoplay) clearInterval(autoplay);
+    monokai();
+}
+function toggleSteppingCodeView() {
+
+}
+
+function stepForward() {
+    if(stepping == true) {
+        returnIDFloat += 1;
+    }
+}
+
+function stepBackward() {
+    if(stepping == true) {
+        returnIDFloat -= 1;
+        if(returnIDFloat<0) returnIDFloat = 0;
+    }
+}
+
+function startAutoStepping() {
+
+}
+function stopAutoStepping() {
+
+}
+
+
 $("#b0").click(function(){
     if(stepping == true) {
         returnIDFloat -= 1;
@@ -520,6 +580,27 @@ $("#b7").click(function(){
     undecoratedCode = editor.getValue();
     process();
     editor.setValue(decoratedCode);
+});
+$("#b20").click(function(){
+	activateStepMode();
+});
+$("#b21").click(function(){
+	deactivateStepMode();
+});
+$("#b22").click(function(){
+	stepForward();
+});
+$("#b23").click(function(){
+	stepBackward();
+});
+$("#b24").click(function(){
+	startAutoStepping();
+});
+$("#b25").click(function(){
+	stopAutoStepping();
+});
+$("#b26").click(function(){
+	toggleSteppingCodeView();
 });
 
 function highlightLine(lineNumber) {
