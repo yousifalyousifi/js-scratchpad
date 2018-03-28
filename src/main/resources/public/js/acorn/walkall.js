@@ -55,6 +55,7 @@ var types = acorn.walkall.types = [
   'ForInStatement',
   'ForInit',
   'ForStatement',
+  'ForOfStatement', //added by yousif
   'ArrowFunctionExpression',
   'Function',
   'FunctionDeclaration',
