@@ -81,7 +81,7 @@
                         </div>
                     </li>
 
-                    <li id="b0" class="nav-item">
+                    <!--<li id="b0" class="nav-item">
                         <a class="nav-link" href="#">back step</a>
                     </li>
                     <li id="b1" class="nav-item">
@@ -101,7 +101,7 @@
                     </li>
                     <li id="b7" class="nav-item">
                         <a class="nav-link" href="#">B7</a>
-                    </li>
+                    </li>-->
 
                     <li id="b20" class="nav-item">
                         <a class="nav-link" href="#">Run Step Mode</a>
@@ -162,8 +162,6 @@ function foo(items) {
         <script src="js/Scratchpad.js"></script>
         <script>
 
-
-
 var editor = ace.edit("editor");
 Range = ace.require('ace/range').Range
 
@@ -181,6 +179,7 @@ editor.setOptions({
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: false
 });
+
 function monokai() {console.log('monokai!');editor.setTheme("ace/theme/monokai");}
 function debugmonokai() {console.log('debugmonokai!');editor.setTheme("ace/theme/debugmonokai");}
 
@@ -189,49 +188,29 @@ if (storedCode) {
     editor.setValue(storedCode);
 } else {editor.setValue("");}
 editor.gotoLine(editor.session.getLength() + 1);
-editor.commands.addCommand({
-    name: 'process',
-    bindKey: {
-        win: 'Ctrl-F',
-        mac: 'Command-F'
-    },
-    exec: function(editor) {
-        try {
-            console.log("processing.")
-            window.localStorage.setItem("code", editor.getValue());
-            undecoratedCode = editor.getValue();
-        } catch(e) {
-            console.error(e);
-        }
-        return false;
-    },
-    readOnly: false // false if this command should not apply in readOnly mode
-});
+
 
 window.pp = function() {
     console.log.apply(null, arguments);
 };
 
-forfeitHighlightControl = false;
-stepping = false;
-returnID = 0;
-globalFuncCallStack = [];
-GLOBAL_INDEX = 0;
-fakeFrameCount = 0;
-fakeMouseX = 0;
-fakeMouseY = 0;
-dummy = {};
-returnIDFloat = 0;
-infiniteLoopPresent = false;
+var stepping = false;
+var returnIDFloat = 0;
+var returnID = 0;
+var globalFuncCallStack = [];
+var GLOBAL_INDEX = 0;
+var fakeFrameCount = 0;
+var fakeMouseX = 0;
+var fakeMouseY = 0;
 
-//stepping
-autostep = 1;
-autoplay = null;
-autointerval = 300;
+//for auto stepping
+var autostep = 1;
+var autoplay = null;
+var autointerval = 300;
 
-isViewingDecoratedCode = false;
-decoratedCode = "";
-undecoratedCode = "";
+var isViewingDecoratedCode = false;
+var decoratedCode = "";
+var undecoratedCode = "";
 
 function process() {
     
@@ -428,16 +407,12 @@ function process() {
         fakeFrameCount++;
         fakeMouseX = tempX;
         fakeMouseY = tempY;
-        if(infiniteLoopPresent) {
-            returnID = Math.trunc(returnIDFloat);
-        } else {
-            returnID = 0;
-            returnIDFloat = 0;
-        }
+        returnID = 0;
+        returnIDFloat = 0;
     }catch(e) {
         if(e.type && e.type == "return") {
             returnID = Math.trunc(returnIDFloat);
-            console.log("super return", returnID);
+            //console.log("super return", returnID);
         } else {
             throw e;
         }
@@ -489,20 +464,31 @@ function process() {
 }
 
 function activateStepMode() {
-    forfeitHighlightControl = true;
+	if(!stepping) {
+	    undecoratedCode = editor.getValue();
+	    process();
+	    window.runThis(decoratedCode, false);
+	}
     stepping = true;
     debugmonokai();
 }
+
 function deactivateStepMode() {
-    forfeitHighlightControl = false;
     stepping = false;
     returnID=0;
     returnIDFloat=0;
     if(autoplay) clearInterval(autoplay);
     monokai();
 }
-function toggleSteppingCodeView() {
 
+function toggleSteppingCodeView() {
+	if(isViewingDecoratedCode) {
+		editor.setValue(undecoratedCode);
+	} else {
+		undecoratedCode = editor.getValue();
+		editor.setValue(decoratedCode);
+	}
+	isViewingDecoratedCode = !isViewingDecoratedCode;
 }
 
 function stepForward() {
@@ -519,73 +505,33 @@ function stepBackward() {
 }
 
 function startAutoStepping() {
-
+	if(stepping) {
+	    //returnID=0;
+	    stepping = true;
+	    if(autoplay) clearInterval(autoplay);
+	    autoplay = setInterval(function() {
+	        returnIDFloat += autostep||1;
+	    },autointerval||300);
+	    debugmonokai();
+	}
 }
+
 function stopAutoStepping() {
-
+	if(stepping) {
+	    if(autoplay) clearInterval(autoplay);
+	}
 }
 
-
-$("#b0").click(function(){
-    if(stepping == true) {
-        returnIDFloat -= 1;
-        if(returnIDFloat<0) returnIDFloat = 0;
-    }
-    forfeitHighlightControl = true;
-    stepping = true;
-    debugmonokai();
-});
-
-$("#b1").click(function(){
-    if(stepping == true) {
-        returnIDFloat += 1;
-    }
-    forfeitHighlightControl = true;
-    stepping = true;
-    debugmonokai();
-});
-
-$("#b2").click(function(){
-    forfeitHighlightControl = false;
-    stepping = false;
-    returnID=0;
-    returnIDFloat=0;
-    if(autoplay) clearInterval(autoplay);
-    monokai();
-});
-
-$("#b4").click(function(){
-    returnID=0;
-    forfeitHighlightControl = true;
-    stepping = true;
-    if(autoplay) clearInterval(autoplay);
-    autoplay = setInterval(function() {
-        returnIDFloat += autostep||1;
-    },autointerval||300);
-    debugmonokai();
-});
-
-$("#b5").click(function(){
-    forfeitHighlightControl = false;
-    stepping = false;
-    if(autoplay) clearInterval(autoplay);
-    monokai();
-});
-
-$("#b6").click(function(){
-    editor.setValue(undecoratedCode);
-});
-
-$("#b7").click(function(){
-    undecoratedCode = editor.getValue();
-    process();
-    editor.setValue(decoratedCode);
-});
 $("#b20").click(function(){
-	activateStepMode();
+	if(!stepping) {
+		activateStepMode();
+	}
 });
 $("#b21").click(function(){
-	deactivateStepMode();
+	if(stepping) {
+    	editor.setValue(undecoratedCode);
+		deactivateStepMode();
+	}
 });
 $("#b22").click(function(){
 	stepForward();
@@ -604,7 +550,7 @@ $("#b26").click(function(){
 });
 
 function highlightLine(lineNumber) {
-    if(forfeitHighlightControl) {
+    if(stepping) {
         let l = lineNumber-1;
         editor.selection.setRange(new Range(l, 10000, l, 0));
     }
