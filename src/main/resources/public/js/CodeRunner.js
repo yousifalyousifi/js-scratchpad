@@ -70,7 +70,7 @@ function CodeRunner(jQSelector) { //The selector should point to a <pre>
 		var consoleHTML = 
 		'<pre>'+
 		'<span>Console Output</span>'+
-		'<hr style="margin:0;" class="codeRunSeparator"/>'+
+		'<hr style="padding-bottom:5px;margin:0;" class="codeRunSeparator"/>'+
 		'</pre>';
 		$("#clearButton").show();
     	$("#displayContainer").html(consoleHTML);
@@ -97,6 +97,7 @@ function CodeRunner(jQSelector) { //The selector should point to a <pre>
 	function insertCodeOutputSeparator() {
 		var line = $(document.createElement("hr"));
 		line.addClass("codeRunSeparator");
+		line.attr("style", "padding-bottom:5px;margin:0;");
 		$(that.jQSelector).append(line);
 	}
 
