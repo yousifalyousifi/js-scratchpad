@@ -1,5 +1,5 @@
-$(document).ready(function() {
-    
+var ScratchPad = function() {
+
     var that = this;
     var currentFontSize = 14;
     var mode = undefined;
@@ -24,7 +24,7 @@ $(document).ready(function() {
     editor.session.setMode("ace/mode/javascript");
     editor.setOptions({
         enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true
+        enableLiveAutocompletion: false
     });
 
     var storedCode = window.localStorage.getItem("code");
@@ -46,7 +46,7 @@ $(document).ready(function() {
         window.autoRerunSketchHandler = setTimeout(function() {
             if(mode == "draw" && appProps.autorun) {
                 console.log("Auto redrawing.")
-                that.runThis(editor.getValue(), false);
+                that.runThis(editor.getValue());
             }
         }, 1000);
     });
@@ -54,7 +54,7 @@ $(document).ready(function() {
         name: 'run',
         bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
         exec: function(editor) {
-            that.runThis(editor.getValue(), true);
+            that.runThis(editor.getValue());
         },
         readOnly: false // false if this command should not apply in readOnly mode
     });
@@ -62,13 +62,17 @@ $(document).ready(function() {
     setFontSize(currentFontSize);
     getSnippets();
 
+    this.getEditor = function() {
+    	return editor;
+    }
+
     function setFontSize(size) {
         editor.setFontSize(size);
         $("#displayContainer").css("font-size", size+"px");
     }
 
     $("#runButton").click(function() {
-        that.runThis(editor.getValue(), true);
+        that.runThis(editor.getValue());
     });
 
     $("#font14px").click(function() {
@@ -282,11 +286,11 @@ $(document).ready(function() {
     }
 
     var someUniqueId = "ID" + (new Date().getTime());
-    this.runThis = function(code, send) {
+    this.runThis = function(code) {
     	runner.runThis(code);
-        if(mode == "draw" && send) {
-            sendSketch(someUniqueId, code);
-            console.log("Sent code from ID: " + someUniqueId);
+        if(mode == "draw") {
+            //sendSketch(someUniqueId, code);
+            //console.log("Sent code from ID: " + someUniqueId);
         }
     };
 
@@ -315,13 +319,13 @@ $(document).ready(function() {
 	    })
 	      .done(function( msg ) {
 	        console.log(msg);
-	        var snippets = msg;
-	        var tableBody = $("#snippetsTableBody");
-	        for(var i = 0; i < snippets.length; i++) {
-	            var row = document.createElement("tr");
-	            var id = document.createElement("td");
-	            var title = document.createElement("td");
-	            var snippetId = snippets[i].id;
+	        let snippets = msg;
+	        let tableBody = $("#snippetsTableBody");
+	        for(let i = 0; i < snippets.length; i++) {
+	            let row = document.createElement("tr");
+	            let id = document.createElement("td");
+	            let title = document.createElement("td");
+	            let snippetId = snippets[i].id;
 	            $(id).text(snippetId);
 	            $(title).text(snippets[i].title);
 	            $(row).append(id).append(title);
@@ -396,4 +400,4 @@ $(document).ready(function() {
         .fail(fail);
     }
 
-});
+};
