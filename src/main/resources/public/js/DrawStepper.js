@@ -1,31 +1,11 @@
-var Stepper = function() {
+var DrawStepper = function(scratchpad) {
 	//var editor = ace.edit("editor");
 	Range = ace.require('ace/range').Range
 
 	var editor = scratchpad.getEditor();
 
-	//var storedCode = window.localStorage.getItem("code");
-	//if (storedCode) {
-	//    editor.setValue(storedCode);
-	//} else {
-	//    editor.setValue($("#defaultCode").text());
-	//}
-
-	//editor.setTheme("ace/theme/monokai");
-	//editor.session.setMode("ace/mode/javascript");
-	//editor.setOptions({
-	//    enableBasicAutocompletion: true,
-	//    enableLiveAutocompletion: false
-	//});
-
-	function monokai() {console.log('monokai!');editor.setTheme("ace/theme/monokai");}
-	function debugmonokai() {console.log('debugmonokai!');editor.setTheme("ace/theme/debugmonokai");}
-
-	//var storedCode = window.localStorage.getItem("code");
-	//if (storedCode) {
-	    //editor.setValue(storedCode);
-	//} else {editor.setValue("");}
-	//editor.gotoLine(editor.session.getLength() + 1);
+	function monokai() {editor.setTheme("ace/theme/monokai");}
+	function debugmonokai() {editor.setTheme("ace/theme/debugmonokai");}
 
 	window.pp = function() {
 	    console.log.apply(null, arguments);
@@ -34,6 +14,7 @@ var Stepper = function() {
 	window.stepping = false;
 	window.returnIDFloat = 0;
 	window.returnID = 0;
+	window.prevreturnID = 0;
 	window.globalFuncCallStack = [];
 	window.GLOBAL_INDEX = 0;
 	window.fakeFrameCount = 0;
@@ -51,6 +32,11 @@ var Stepper = function() {
 
 	window.BREAKPOINT = function(lineNumber) {
 	    if(stepping&&++GLOBAL_INDEX>=returnID) {highlightLine(lineNumber);throw {type:"return"};}
+	}
+
+	window.enableStepper = function(enable) {
+		let el = $("#steppingDropdown");
+		(enable ? el.show() : el.hide());
 	}
 
 	function process() {
@@ -166,7 +152,6 @@ var Stepper = function() {
 
 		        try {
 		        	let twoAncestorsAboveNode = node.ancestors.slice(node.ancestors.length-3, node.ancestors.length-1).map(i => i.type);
-		        	window.koko = node.ancestors;
 		        	if(twoAncestorsAboveNode.equals([_VariableDeclaration, _VariableDeclarator])) {
 						prePosition = node.ancestors[node.ancestors.length-3].range[0]
 		        	} else {
@@ -225,6 +210,7 @@ var Stepper = function() {
 	        let decoratedLine;
 
 	        let topWrap = `
+	        //if(prevreturnID>=returnIDFloat) return;
 	    GLOBAL_INDEX =-1;
 	    frameCount = fakeFrameCount;
 	    let tempX = mouseX;
@@ -247,6 +233,7 @@ var Stepper = function() {
 	        returnIDFloat = 0;
 	    }catch(e) {
 	        if(e.type && e.type == "return") {
+	        	//prevreturnID = returnID;
 	            returnID = Math.trunc(returnIDFloat);
 	            //console.log("super return", returnID);
 	        } else {
@@ -352,46 +339,66 @@ var Stepper = function() {
 	function startAutoStepping() {
 		if(stepping) {
 		    //returnID=0;
-		    stepping = true;
 		    if(autoplay) clearInterval(autoplay);
 		    autoplay = setInterval(function() {
-		        returnIDFloat += autostep||1;
-		    },autointerval||300);
+		    	let direction = $("#reverseCheckbox")[0].checked ? -1 : 1;
+		        returnIDFloat += (autostep||1)*direction;
+		        if(returnIDFloat<0) returnIDFloat = 0;
+		    },window.autointerval||300);
 		    debugmonokai();
 		}
 	}
 
 	function stopAutoStepping() {
-		if(stepping) {
+		if(stepping && autoplay) {
 		    if(autoplay) clearInterval(autoplay);
+		    autoplay = null;
 		}
 	}
 
-	$("#b20").click(function(){
+	$("#b26").click(function(){
+		toggleSteppingCodeView();
+	});
+	$("#b27").click(function(){//manual
 		if(!stepping) {
 			activateStepMode();
 		}
+		if(autoplay) {
+			stopAutoStepping();
+		}
+		$(".manualStepControl").show();
+		$(".autoStepControl").hide();
 	});
-	$("#b21").click(function(){
+	$("#b28").click(function(){//auto
+		if(!stepping) {
+			activateStepMode();
+		}
+		if(!autoplay) {
+			startAutoStepping();
+		}
+		$(".manualStepControl").hide();
+		$(".autoStepControl").show();
+	});
+	$("#b29").click(function(){//turn off
 		if(stepping) {
 	    	editor.setValue(undecoratedCode);
+			stopAutoStepping();
 			deactivateStepMode();
 		}
+		$(".manualStepControl").hide();
+		$(".autoStepControl").hide();
 	});
-	$("#b22").click(function(){
-		stepForward();
-	});
-	$("#b23").click(function(){
-		stepBackward();
-	});
-	$("#b24").click(function(){
+	$("#autoIntervalSlider").change(function(e) {
+		console.log(e.target.value);
+		window.autointerval = e.target.value;
+		stopAutoStepping();
 		startAutoStepping();
 	});
-	$("#b25").click(function(){
-		stopAutoStepping();
+	$("#stepForward").click(function(){
+		stepForward();
 	});
-	$("#b26").click(function(){
-		toggleSteppingCodeView();
+	$("#stepBackward").click(function(){
+		stepBackward();
 	});
 
 	function highlightLine(lineNumber) {

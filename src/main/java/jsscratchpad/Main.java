@@ -1,5 +1,7 @@
 package jsscratchpad;
 import static spark.Spark.get;
+import static spark.Spark.put;
+import static spark.Spark.delete;
 import static spark.Spark.port;
 import static spark.Spark.before;
 import static spark.Spark.halt;
@@ -39,6 +41,7 @@ public class Main {
 	        final Gson gson = new Gson();
 			final DataSource dataSource = DatabaseUtil.getDatasource();
 			SnippetUtil.createTable();
+			UserSnippetUtil.createTable();
 			UserUtil.createTable();
 	        
 			port(Integer.valueOf(System.getenv("PORT")));
@@ -47,17 +50,18 @@ public class Main {
 			final CanvasViewer viewer = new CanvasViewer();
 			Spark.webSocket("/sketch/connect", viewer);
 
-//			get("/users", (request, response) -> {
-//				return UserUtil.getAllUsers();
-//			}, gson::toJson);
+			get("/users", (request, response) -> {
+				return UserUtil.getAllUsers();
+			}, gson::toJson);
 			
 			post("/login", (req, res) -> {
 				String username = req.queryParams("username");
 				String password = req.queryParams("password");
 				if(UserUtil.verify(username, password)) {
-					res.cookie("loggedin", "true");
 					Session s = req.session(true);
+					s.maxInactiveInterval(60*30);
 					s.attribute("username", username);
+					res.cookie("username", username);
 					res.status(200);
 				} else {
 					res.status(403);
@@ -77,39 +81,83 @@ public class Main {
 				return "";
 			});
 
-//			before("/private/*", (request, response) -> {
-//			    if(request.session() == null || request.session().attribute("username") == null) {
-//				    halt(401, "Go Away!");
-//			    }
-//			});
+			before("/user/*", (request, response) -> {
+			    if(request.session() == null || request.session().attribute("username") == null) {
+				    halt(401, "Unauthorized, please sign in.");
+			    }
+			});
 			
-//			get("/login/:u/:p", (req, res) -> {
-//				if(UserUtil.verify(req.params(":u"), req.params(":p"))) {
-//					res.status(200);
-//				} else {
-//					res.status(403);
-//				}
-//				return "";
-//			});
-//
-//			get("/register/:u/:p", (req, res) -> {
-//				if(UserUtil.register(req.params(":u"), req.params(":p"))) {
-//					res.status(200);
-//				} else {
-//					res.status(403);
-//				}
-//				return "";
-//			});
+			get("/user/check", (request, response) -> {
+			    return request.session().attribute("username");
+			});
 
+			get("/user/snippet/load/:id", (req, res) -> {
+				String username = req.session().attribute("username");
+				res.type("application/json");
+				Integer id = Integer.parseInt(req.params(":id"));
+				return UserSnippetUtil.getSnippetForUser(id, username);
+			}, gson::toJson);
+
+			delete("/user/snippet/delete/:id", (req, res) -> {
+				String username = req.session().attribute("username");
+				Integer id = Integer.parseInt(req.params(":id"));
+				UserSnippetUtil.deleteSnippetForUser(id, username);
+				res.status(200);
+				return "";
+			});
+			
+			get("/user/snippet/check/:title", (req, res) -> {
+				String username = req.session().attribute("username");
+				res.type("application/json");
+				System.out.println(req.params(":title"));
+				return UserSnippetUtil.snippetTitleExistsForUser(username, req.params(":title"));
+			}, gson::toJson);
+
+			get("/user/snippet/list", (req, res) -> {
+				String username = req.session().attribute("username");
+				res.type("application/json");
+				return UserSnippetUtil.getAllSnippetInfoForUser(username);
+			}, gson::toJson);
+			
+//			get("/user/snippet/all", (req, res) -> {
+//				res.type("application/json");
+//				return UserSnippetUtil.getAllUserSnippetsInfo();
+//			}, gson::toJson);
+
+			put("/user/snippet/update", (req, res) -> {
+				String username = req.session().attribute("username");
+				Integer id = Integer.parseInt(req.queryParams("id"));
+				String snippet = req.queryParams("snippet");
+				if(UserSnippetUtil.snippetIdExistsForUser(username, id)) {
+					UserSnippetUtil.updateSnippetForUser(id, username, snippet);
+					res.status(200);
+					return id;
+				} else {
+					res.status(500);
+					return "Snippet must exist first. Try Save As.";
+				}
+			});
+			
+			post("/user/snippet/save", (req, res) -> {
+				String username = req.session().attribute("username");
+				String title = req.queryParams("title");
+				String snippet = req.queryParams("snippet");
+				Integer id = UserSnippetUtil.saveSnippetAsForUser(username, title, snippet);
+				res.status(200);
+				return id;
+			});
+			
 			post("/register", (req, res) -> {
 				String username = req.queryParams("username");
 				String password = req.queryParams("password");
-				if(UserUtil.register(username, password)) {
+				try {
+					UserUtil.register(username, password);
 					res.status(200);
-				} else {
-					res.status(403);
+					return "";
+				} catch (RuntimeException e) {
+					res.status(500);
+					return e.getMessage();
 				}
-				return "";
 			});
 
 			
@@ -123,7 +171,7 @@ public class Main {
 				try (Connection connection = dataSource.getConnection();
 					Statement stmt = connection.createStatement();
 					ResultSet rs = stmt.executeQuery("SELECT * FROM snippet;");) {
-					
+
 					ArrayList<Snippet> output = new ArrayList<Snippet>();
 					while (rs.next()) {
 						Snippet l = new Snippet();
@@ -132,9 +180,9 @@ public class Main {
 						l.setSnippet(rs.getString("snippet"));
 						output.add(l);
 					}
-					System.out.println(output.size());
 					return output;
 				} catch (Exception e) {
+					e.printStackTrace();
 					return e.getMessage();
 				}
 			}, gson::toJson);

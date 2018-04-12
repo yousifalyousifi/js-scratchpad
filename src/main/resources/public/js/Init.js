@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
-	window.scratchpad = new ScratchPad();
-	window.stepper = new Stepper();
+	var scratchpad = new ScratchPad();
+	var stepper = new DrawStepper(scratchpad);
+	var userActions = new UserActions(scratchpad);
 
 });

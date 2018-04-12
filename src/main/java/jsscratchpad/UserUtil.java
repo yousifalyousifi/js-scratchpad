@@ -16,8 +16,8 @@ public class UserUtil {
 		DataSource dataSource = DatabaseUtil.getDatasource();
 		try (Connection connection = dataSource.getConnection();
 				Statement stmt = connection.createStatement()) {
-				//stmt.execute("DROP TABLE IF EXISTS user;");
-				stmt.execute("CREATE TABLE IF NOT EXISTS user("
+				//stmt.execute("DROP TABLE IF EXISTS users;");
+				stmt.execute("CREATE TABLE IF NOT EXISTS users("
 						+ "id serial primary key, "
 						+ "username VARCHAR(32) NOT NULL, "
 						+ "password VARCHAR(80) NOT NULL,"
@@ -81,7 +81,7 @@ public class UserUtil {
 		}
 	}
 	
-	public static boolean register(String username, String password) {
+	public static void register(String username, String password) {
 		DataSource dataSource = DatabaseUtil.getDatasource();
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection
@@ -91,21 +91,20 @@ public class UserUtil {
 
 			ps.setString(1, username);
 			try (ResultSet rs = ps.executeQuery();) {
-				if (rs.next()) {
-					return false;
-				};
-				
-				ps2.setString(1, username);
-				ps2.setString(2, PasswordUtil.hashPassword(password));
-				ps2.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
-				ps2.executeUpdate();
-
-				return true;
+				if (!rs.next()) {
+					ps2.setString(1, username);
+					ps2.setString(2, PasswordUtil.hashPassword(password));
+					ps2.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+					ps2.executeUpdate();
+	
+					return;
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			throw new RuntimeException("Server error.");
 		}
 
+		throw new RuntimeException("User already exists.");
 	}
 }

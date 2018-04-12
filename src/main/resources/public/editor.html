@@ -80,14 +80,47 @@
                             <a id="drawMode" class="dropdown-item" href="#">Draw</a>
                         </div>
                     </li>
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" style="display:none;" id="steppingDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Stepping
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="steppingDropdown">
+                            <a id="b27" class="dropdown-item" href="#">Manual</a>
+                            <a id="b28" class="dropdown-item" href="#">Auto</a>
+                            <a id="b29" class="dropdown-item" href="#">Turn Off</a>
+                            <a id="b26" class="dropdown-item" href="#">Toggle Step Code</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                            <button style="display:none;" id="stepBackward" type="button" class="manualStepControl btn btn-default">▲</button>
+                            <button style="display:none;" id="stepForward" type="button" class="manualStepControl btn btn-default">▼</button>
+                            <input style="display:none;" id="autoIntervalSlider" type="range" min="1" max="1000" value="300" class="slider autoStepControl">
+                            <input style="display:none;" type="checkbox" id="reverseCheckbox" class="autoStepControl">
+                            <label style="display:none;" for="reverseCheckbox" class="autoStepControl">Reverse</label>
+                    </li>
+
                 </ul>
                 
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                      <a class="userControl nav-link" href="#">Save</a>
+                    <li id="labelArea" class="nav-item">
+                        <span><span id="userLabel"></span><br/><span id="statusMessageLabel"></span></span>
                     </li>
-                    <li class="nav-item">
-                      <a class="userControl nav-link" href="#">Load</a>
+                    <li id="" class="nav-item">
+                        <div></div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="fileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            File
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="fileDropdown">
+                          <a class="dropdown-item" href="#" id="saveUserSnippets">Save</a>
+                          <a class="dropdown-item" href="#" id="saveAsUserSnippets">Save As</a>
+                          <a class="dropdown-item" href="#" id="viewUserSnippets">My Snippets</a>
+                          <a class="dropdown-item" href="#" id="newUserSnippet">New</a>
+                        </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -114,7 +147,14 @@
         <script src="js/ace/ext-language_tools.js"></script>
         <script src="js/jquery/jquery3.2.1.js"></script>
         <script src="js/jquery/jquery.ba-throttle-debounce.min.js"></script>
+        <script src="js/jquery/jquery.cookie.js"></script>
         <script src="js/bootstrap/bootstrap.4.0.0.min.js"></script>
+        
+        <script src="js/acorn/acorn.js"></script>
+        <script src="js/acorn/acorn_loose.js"></script>
+        <script src="js/acorn/walk.js"></script>
+        <script src="js/acorn/walkall.js"></script>
+
         <script src="js/p5/p5.js"></script>
         <script src="js/p5/addons/p5.sound.js"></script>
         <script src="js/p5/addons/p5.dom.js"></script>
@@ -123,6 +163,9 @@
         <script src="js/CodeRunner.js"></script>
         <script src="js/DrawRunner.js"></script>
         <script src="js/Scratchpad.js"></script>
+        <script src="js/DrawStepper.js"></script>
+        <script src="js/UserActions.js"></script>
+        <script src="js/Init.js"></script>
         <script>
         </script>
         <div class="modal fade" id="snippetsModal" role="dialog" aria-labelledby="snippetsModalTitle" aria-hidden="true">
@@ -220,5 +263,63 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="loadModal" role="dialog" aria-labelledby="loadModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"> 
+                        <h4 class="modal-title" id="loadModalTitle">Load Snippet</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="max-height: 300px; overflow: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                <th>Snippet Title</th>
+                                <th>Last Modified</th>
+                                <th></th>
+                                </tr>
+                                </thead>
+                                <tbody id="loadTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="saveModal" role="dialog" aria-labelledby="saveModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"> 
+                        <h4 class="modal-title" id="saveModalTitle">Save Snippet As</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                          <div class="form-group">
+                            <label for="snippetTitleInput" class="col-form-label">Snippet name:</label>
+                            <input type="text" class="form-control" id="snippetTitleInput">
+                          </div>
+                          <button class="submitModal btn btn-primary mr-auto">Save</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <span class="saveModalStatus"></span>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>

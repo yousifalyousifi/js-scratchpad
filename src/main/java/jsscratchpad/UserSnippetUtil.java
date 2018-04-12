@@ -31,7 +31,6 @@ public class UserSnippetUtil {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		UserSnippet o;
 	}
 	//get all snippet names for user
 	public static ArrayList<UserSnippet> getAllSnippetInfoForUser(String username) {
@@ -143,6 +142,22 @@ public class UserSnippetUtil {
 						"SELECT * FROM usersnippet where username = ? and title = ?;");) {
 			ps.setString(1, username);
 			ps.setString(2, title);
+			try(ResultSet rs = ps.executeQuery();) {
+				return rs.isBeforeFirst();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static boolean snippetIdExistsForUser(String username, Integer id) {
+		DataSource dataSource = DatabaseUtil.getDatasource();
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(
+						"SELECT * FROM usersnippet where username = ? and id = ?;");) {
+			ps.setString(1, username);
+			ps.setInt(2, id);
 			try(ResultSet rs = ps.executeQuery();) {
 				return rs.isBeforeFirst();
 			}
