@@ -7,10 +7,6 @@ var DrawStepper = function(scratchpad) {
 	function monokai() {editor.setTheme("ace/theme/monokai");}
 	function debugmonokai() {editor.setTheme("ace/theme/debugmonokai");}
 
-	window.pp = function() {
-	    console.log.apply(null, arguments);
-	};
-
 	window.stepping = false;
 	window.returnIDFloat = 0;
 	window.returnID = 0;

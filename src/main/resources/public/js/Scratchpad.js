@@ -134,7 +134,7 @@ var ScratchPad = function() {
     });
     
     //https://stackoverflow.com/a/3442342/1987694
-    $('#settingsCheckbox input:checkbox').change(function() {
+    $('#autorunCheckbox').change(function() {
         // this will contain a reference to the checkbox   
         if (this.checked) {
             // the checkbox is now checked 
@@ -190,8 +190,10 @@ var ScratchPad = function() {
     this.runThis = function(code) {
     	runner.runThis(code);
         if(mode == "draw") {
-            //sendSketch(someUniqueId, code);
-            //console.log("Sent code from ID: " + someUniqueId);
+        	if($("#sendCheckbox")[0].checked) {
+	            sendSketch(someUniqueId, code);
+	            console.log("Sent code from ID: " + someUniqueId);
+	        }
         }
     };
 

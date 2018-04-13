@@ -14,16 +14,25 @@
     }
     </style>
     <body>
-
         <div id="displayContainer">
         </div>
         <script src="/js/jquery/jquery3.2.1.js"></script>
         <script src="/js/jquery/jquery.ba-throttle-debounce.min.js"></script>
         <script src="/js/p5/p5.js"></script>
         <script src="/js/p5/addons/p5.dom.js"></script>
+        <script src="/js/acorn/acorn.js"></script>
+        <script src="/js/acorn/acorn_loose.js"></script>
+        <script src="/js/acorn/walk.js"></script>
+        <script src="/js/SketchViewer.js"></script>
         
+        <span style="display:none;" id="theCode">${code}</span>
         <script>
-            ${code}
+			var sv = new SketchViewer();
+			try {
+            	$.globalEval(sv.loopBreaker($("#theCode").text()));
+            } catch (e) {
+            	console.error(e);
+            }
             window.alert = function() {};
             window.prompt = function() {};
             //window.console.log = function() {};
