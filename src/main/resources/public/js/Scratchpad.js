@@ -116,6 +116,11 @@ var ScratchPad = function() {
         }
     });
 
+    $("#colorPicker").click(function() {
+        let pickerUrl = "https://www.google.ca/search?q=color+picker";
+        window.open(pickerUrl, "_blank").focus();
+    });
+
     //https://stackoverflow.com/a/28603203/1987694
     $("#ratioButtons :input").change(function() {
         let ratio = $(this).attr("id");

@@ -9,11 +9,13 @@ function DrawRunner(divId) {
 		'<div style="position: relative;"><div id="' + divId + '"/></div>'+ //this double wrapped div fixes p5.dom element positioning (kind of)
 		'</pre>';
         $("#p5RefButton").show();
+        $("#colorPicker").show();
     	$("#displayContainer").html(drawHTML);
     };
 
     this.exitMode = function() {
         $("#p5RefButton").hide();
+        $("#colorPicker").hide();
     };
 
 	this.runThis = function(code) {

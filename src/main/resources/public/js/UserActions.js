@@ -57,7 +57,11 @@ var UserActions = function(scratchpad, editor) {
 		function ifNotLoggedIn() {
 			$('#loadModal').modal('hide');
 		}
-		checkLoggedIn(doIfLoggedIn, function(){doIfNotLoggedIn(ifNotLoggedIn)});
+
+		var confirmed = confirm("Are you sure you want to load this snippet?");
+		if(confirmed) {
+			checkLoggedIn(doIfLoggedIn, function(){doIfNotLoggedIn(ifNotLoggedIn)});
+		}
 	};
 
 	this.saveSnippetAs = function(title, code) {
@@ -121,7 +125,7 @@ var UserActions = function(scratchpad, editor) {
 		editor.setValue("");
 	};
 
-	this.deleteSnippet = function(id) {
+	this.deleteSnippetAndRow = function(id, row) {
 		function doIfLoggedIn() {
 			$.ajax({
 			  method: "DELETE",
@@ -140,7 +144,11 @@ var UserActions = function(scratchpad, editor) {
 		function ifNotLoggedIn() {
 			$('#loadModal').modal('hide');
 		}
-		checkLoggedIn(doIfLoggedIn, function(){doIfNotLoggedIn(ifNotLoggedIn)});
+		var confirmed = confirm("Are you sure you want to delete this snippet?");
+		if(confirmed) {
+			checkLoggedIn(doIfLoggedIn, function(){doIfNotLoggedIn(ifNotLoggedIn)});
+			$(row).remove();
+		}
 	};
 
 	function bindUI() {
@@ -195,8 +203,7 @@ var UserActions = function(scratchpad, editor) {
 					})(snippetId);
 					(function(l_id, row) {
 						$(actionsCell).children(".deleteUserSnippetButton").click(function() {
-							that.deleteSnippet(l_id);
-							$(row).remove();
+							that.deleteSnippetAndRow(l_id, row);
 						});
 					})(snippetId, row);
 
