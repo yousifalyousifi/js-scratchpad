@@ -42,7 +42,12 @@ public class SnippetUtil {
 					"100_missing_variable.js",
 					"101_adding_strings.js",
 					"500_p5_2D_template.js",
-					"600_p5_3D_template.js"
+					"600_p5_3D_template.js",
+					"601_fire_scene.js",
+					"602_house_scene.js",
+					"603_car_scene.js",
+					"604_flower_scene.js",
+					"605_ship_scene.js"
 				};
 				for (String filename : snippetFileNames) {
 					int separatorIndex = filename.indexOf('_');
