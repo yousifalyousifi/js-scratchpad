@@ -99,6 +99,8 @@
           <div class="canvasViewButtons">
             <span class="sketchLabel"></span>
             <!-- <button type="button" class="btn btn-dark btn-sm">Close</button> -->
+            <button type="button" class="btn btn-dark btn-sm loopBtn">Loop</button>
+            <button type="button" class="btn btn-dark btn-sm noLoopBtn">NoLoop</button>
           </div>
         </div>
       </div>
@@ -171,10 +173,8 @@
                 if(!divExists(id)) {
                   // createPopup(id);
                   appendDiv(id);
-                  insertOrReplaceIframeInDiv(id);
-                } else {
-                  insertOrReplaceIframeInDiv(id);
                 }
+                insertOrReplaceIframeInDiv(id);
                 createOrReplaceRefreshInterval(id);
               }
           };
@@ -202,11 +202,21 @@
         if(refreshIntervalHandles[divId]) {
             clearInterval(refreshIntervalHandles[divId]);
         }
+
+        function rewireButtonsInDiv(div, iframeInnerDoc) {
+            $(div).find(".loopBtn").unbind();
+            $(div).find(".noLoopBtn").unbind();
+            $(div).find(".loopBtn").click(i => iframeInnerDoc.loadLoopingCode());
+            $(div).find(".noLoopBtn").click(i => iframeInnerDoc.loadNoLoopCode());
+        }
+
         function intervalFunc() {
+            let div = $("#"+divId)[0];
             let iframe = $("#"+divId + " iframe")[0];
             if(iframe) { // this guard is needed because sometimes this function is called too soon, and the browser hadn't had enough time to create the iframe.
                 let innerDoc = iframe.contentDocument || iframe.contentWindow.document;
                 let canvas = innerDoc.getElementsByTagName("canvas")[0];
+                rewireButtonsInDiv(div, innerDoc);
                 if(canvas) { //this guard is needed for the same reason as above. The browser my not have created the canvas yet.
                   if(!originalSizes[divId]) {
                     let canvaswidth = canvas.style.width.substr(0,canvas.style.width.length-2);
@@ -239,6 +249,7 @@
         let handle = setInterval(intervalFunc, 100); //we start a fast refresher, then slow it down once the canvas elements loads
         refreshIntervalHandles[divId] = handle;
       }
+
 
       function clearAllRefreshIntervals() {
         for (var key in refreshIntervalHandles) {

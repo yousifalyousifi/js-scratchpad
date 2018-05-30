@@ -28,8 +28,39 @@
         <span style="display:none;" id="theCode">${code}</span>
         <script>
 			var sv = new SketchViewer();
+			var infiniteLoopSafeCode = sv.loopBreaker($("#theCode").text());
+            document.loadLoopingCode = function() {
+	            if(document.p5Instance) {
+		            document.p5Instance.remove();
+		            $("#displayContainer").html("");
+		        }
+            	$.globalEval(infiniteLoopSafeCode);
+            	document.p5Instance = new p5(undefined, "displayContainer");
+            	fixPositioning();
+            	
+            };
+            document.loadNoLoopCode = function() {
+            	let noLoopCode = sv.addNoLoopToCode(infiniteLoopSafeCode);
+	            if(document.p5Instance) {
+		            document.p5Instance.remove();
+		            $("#displayContainer").html("");
+		        }
+            	$.globalEval(noLoopCode);
+            	document.p5Instance = new p5(undefined, "displayContainer");
+            	fixPositioning();
+            };
+            
+            //I don't know what this is needed. 
+            //But without it, the displayContainer gets put in the wrong position in Chrome, until the the DOM is redrawn
+            function fixPositioning() {
+            	setTimeout(function(){
+            		$("#displayContainer").hide().show(0);
+            	},1000);
+            }
+            
+            
 			try {
-            	$.globalEval(sv.loopBreaker($("#theCode").text()));
+            	document.loadNoLoopCode();
             } catch (e) {
             	console.error(e);
             }
@@ -38,7 +69,6 @@
             //window.console.log = function() {};
             //window.console.error = function() {};
             parent = window;
-            document.p5Instance = new p5(undefined, "displayContainer");
         </script>
 
     </body>
