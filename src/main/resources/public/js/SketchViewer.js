@@ -62,6 +62,39 @@ var SketchViewer = function() {
 		return code;
 	};
 
+	this.addNoLoopToCode = function(code) {
+	    let markers = [];
+	    let nodes = [];
+
+	    function insertAtPos(text, position) {
+	    	markers.push(new InsertionMarker(text, position));
+	    }
+
+	    function processFunctionDeclaration(node) {
+	    	if(node.id && node.id.name == "setup") {
+				let blockNode = node.body;
+       			insertAtPos("noLoop();", blockNode.range[1]-1);
+	    	}
+	    }
+
+	    let ast = acorn.parse(code, {
+	        ranges: true,
+	        locations: true
+	    });
+
+	    acorn.walk.simple(ast, {
+	        FunctionDeclaration(node){processFunctionDeclaration(node);}
+	    });
+
+	    markers.sort(InsertionMarkerSorter);
+		markers.reverse();
+		for(let m of markers) {
+			code = code.slice(0, m.position) + m.textToInsert + code.slice(m.position);
+		}
+
+		return code;
+	};
+
 	//https://stackoverflow.com/a/8084248
 	function createRandomVariableName() {
 		return `_${Math.random().toString(36).substring(2)}`;
