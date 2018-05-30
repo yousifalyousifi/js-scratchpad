@@ -2,20 +2,21 @@ var SketchViewer = function() {
 
 	this.loopBreaker = function(code) {
 		let maximumLoopIterations = 10000;
+		let maximumMilliseconds = 1000;
 	    let markers = [];
 	    let nodes = [];
-
 	    function insertAtPos(text, position) {
 	    	markers.push(new InsertionMarker(text, position));
 	    }
 
 	    function createVariableDeclarationString(name) {
-	    	return `let ${name} = 0;`;
+	    	return `let ${name} = new Date().getTime();`;
 	    }
 
 	    function createLoopBreakConditionString(name) {
-	    	let msg = "reached loop iteration maximum";
-	    	return `if(${name}++>${maximumLoopIterations}){console.error("${msg}");throw "HighIterationLoopException";}`;
+	    	let msg = `loop took too long to finish: ${maximumMilliseconds} milliseconds`;
+	    	// return `if(${name}>${maximumLoopIterations}){console.error("${msg}");throw "HighIterationLoopException";}`;
+	    	return `if(new Date().getTime() - ${name}>${maximumMilliseconds}){console.error("${msg}");throw "HighDurationLoopException";}`;
 	    }
 
 	    function isNodeBodyABlock(node) {
@@ -24,16 +25,18 @@ var SketchViewer = function() {
 
 	    function processLoopStatement(node) {
 	    	let varName = createRandomVariableName();
-	    	let loopBreaker = createLoopBreakConditionString(varName);
+	    	let loopBreakerStr = createLoopBreakConditionString(varName);
 	    	let varDecl = createVariableDeclarationString(varName);
     		let startPos = node.range[0];
+
 	    	insertAtPos(varDecl, startPos);
 	    	if(isNodeBodyABlock(node)) {
 	    		let block = node.body;
-	    		insertAtPos(loopBreaker, block.range[0]+1);
+	    		insertAtPos(loopBreakerStr, block.range[0]+1);
 	    	} else {
+	    		//this branch is for when the loop body is just a single line
 	    		let someExpression = node.body;
-	    		insertAtPos("{"+loopBreaker, someExpression.range[0]-1);
+	    		insertAtPos("{"+loopBreakerStr, someExpression.range[0]-1);
 	    		insertAtPos("}", someExpression.range[1]);
 	    	}
 	    }
@@ -51,6 +54,7 @@ var SketchViewer = function() {
 
 	    markers.sort(InsertionMarkerSorter);
 		markers.reverse();
+		
 		for(let m of markers) {
 			code = code.slice(0, m.position) + m.textToInsert + code.slice(m.position);
 		}
