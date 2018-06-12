@@ -6,8 +6,8 @@ It also provides a **Draw** mode, so users can quickly start creating simple ske
 
 ### Console Mode
 
-<img src="http://you-sif.com/github/jspad_console.png" width="200">
+<img src="http://you-sif.com/github/jspad_console.png" width="500">
 
 ### Draw Mode
 
-<img src="http://you-sif.com/github/jspad_draw.png" width="200">
+<img src="http://you-sif.com/github/jspad_draw.png" width="500">
